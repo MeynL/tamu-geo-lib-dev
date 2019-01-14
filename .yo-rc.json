@@ -1,0 +1,38 @@
+{
+  "generator-ngx-library": {
+    "version": "6.2.1",
+    "authorName": "MeynL",
+    "authorEmail": "724610695@qq.com",
+    "githubUsername": "MeynL",
+    "githubRepoName": "MeynL",
+    "projectName": "tamu-geo-lib",
+    "projectVersion": "0.0.1",
+    "projectDescription": "Angular library built with ❤ using ngx-library yeoman generator.",
+    "projectKeywords": [
+      "ng",
+      "angular",
+      "library"
+    ],
+    "ngVersion": "6.0.0",
+    "ngModules": [
+      "core",
+      "common"
+    ],
+    "otherDependencies": [],
+    "additionalPackageFiles": [],
+    "dependenciesRange": "^",
+    "ngPrefix": "my-lib",
+    "testingFramework": "karma",
+    "useGreenkeeper": false,
+    "useCompodoc": false,
+    "enforceNgGitCommitMsg": true,
+    "exclusions": [
+      "demo/proxy.conf.json",
+      "demo/src/jestGlobalMocks.ts",
+      "demo/src/setupJest.ts",
+      "config/jestGlobalMocks.ts",
+      "config/setupJest.ts"
+    ],
+    "deleteExclusions": []
+  }
+}
