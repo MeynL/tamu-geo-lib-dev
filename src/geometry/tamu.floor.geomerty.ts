@@ -1,3 +1,4 @@
+import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 import * as THREE from 'three';
 import 'polybooljs';
 
@@ -13,10 +14,18 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
   private start = 0;
   private uvStart = 0;
 
+  private poly;
   private polyJson: any;
 
   constructor(private shape: THREE.Shape) {
     super(shape);
+    // console.log('shape', shape.getPointsHoles(1));
+    this.poly = this.vertices.concat(this.vertices[0]);
+    this.polyJson = this.threeVector2BuildPolyList(this.poly);
+    this.halfs = [{
+      size: new THREE.Vector2(1, 1),
+      origin: new THREE.Vector2(0, 0),
+    }];
   }
 
   /**
@@ -29,6 +38,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
    */
   public generateFaceUV(vertices: [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][], subsection: number) {
     // let truePoints = [];
+    this.vertices = [];
     vertices.forEach(p => {
       if (p.length !== 4) {
         return;
@@ -43,18 +53,22 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
 
   private buildFace(p1: THREE.Vector3, p2: THREE.Vector3, p3: THREE.Vector3, p4: THREE.Vector3) {
     let truePoints: THREE.Vector3[] = [];
-    if (this.pointInPoly(p1, this.shape)) {
+    if (FlooringplanUtil.pointInPolygon2(p1.x, p1.y, this.poly)) {
       truePoints.push(p1);
     }
-    if (this.pointInPoly(p2, this.shape)) {
+    if (FlooringplanUtil.pointInPolygon2(p2.x, p2.y, this.poly)) {
+      // if (this.pointInPoly(p2, this.poly)) {
       truePoints.push(p2);
     }
-    if (this.pointInPoly(p3, this.shape)) {
+    if (FlooringplanUtil.pointInPolygon2(p3.x, p3.y, this.poly)) {
+      // if (this.pointInPoly(p3, this.poly)) {
       truePoints.push(p3);
     }
-    if (this.pointInPoly(p4, this.shape)) {
+    if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
+      // if (this.pointInPoly(p4, this.poly)) {
       truePoints.push(p4);
     }
+    console.log('111', truePoints);
     if (truePoints.length === 4) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
@@ -70,14 +84,16 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
         regions: [this.polyJson],
         inverted: false,
       });
-      let vecs = this.polyListBuildThreeVector2(intersect.regions[0]);
-      if (!this.computePolyDirection(vecs)) {
-        vecs = this.changePolyDirection(vecs);
+      if (intersect.regions.length > 0) {
+        let vecs = this.polyListBuildThreeVector2(intersect.regions[0]);
+        if (!this.computePolyDirection(vecs)) {
+          vecs = this.changePolyDirection(vecs);
+        }
+        let triangleList = this.findTriangleFromPoly(vecs);
+        triangleList.forEach(triangle => {
+          this.pushFace(triangle, this.randomHalf(), [p1, p2, p3, p4]);
+        });
       }
-      let triangleList = this.findTriangleFromPoly(vecs);
-      triangleList.forEach(triangle => {
-        this.pushFace(triangle, this.randomHalf(), [p1, p2, p3, p4]);
-      });
     }
   }
 
@@ -118,7 +134,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     for (let i = -1, l = poly.length, j = l - 1; ++i < l; j = i) {
       if ((poly[i].y <= point.y && point.y < poly[j].y) || (poly[j].y <= point.y && point.y < poly[i].y)
         && (point.x < (poly[j].x - poly[i].x) * (point.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)) {
-        c = !c;
+        c = true;
       }
     }
     return c;
@@ -194,7 +210,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     return triangleList;
   }
 
-  private threeVector2BuildPolyList(vecotrs: any) {
+  private threeVector2BuildPolyList(vecotrs: THREE.Vector3[]) {
     let poly: any = [];
     vecotrs.forEach((vec: any) => {
       poly.push([vec.x, vec.y]);
@@ -209,4 +225,5 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     });
     return vecList;
   }
+
 }
