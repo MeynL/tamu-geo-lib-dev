@@ -21,12 +21,24 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
 
   constructor(private shape: THREE.Shape) {
     super(shape);
-    this.poly = this.vertices.concat(this.vertices[0]);
-    this.polyJson = this.threeVector2BuildPolyList(this.poly);
+    if (this.vertices.length > 0) {
+      this.poly = this.vertices.concat(this.vertices[0]);
+      this.polyJson = this.threeVector2BuildPolyList(this.poly);
+    }
     // this.halfs = [{
     //   size: new THREE.Vector2(1, 1),
     //   pos: new THREE.Vector2(0, 0),
     // }];
+  }
+
+  public buldSingleFloor(vertices: [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3], subsection: number) {
+    this.clearShape();
+    this.buildHalfFace(subsection);
+    this.randomHalf();
+    let triangles = this.findTriangleFromPoly(this.threeVector2BuildPolyList(vertices));
+    triangles.forEach(triangle => {
+      this.pushFace(this.polyListBuildThreeVector2(triangle), this.half, vertices);
+    });
   }
 
   /**
@@ -184,7 +196,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
       truePoints.push(p4);
     }
-    if (truePoints) {
+    if (truePoints.length === 4) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
       triangleList.forEach(triangle => {
