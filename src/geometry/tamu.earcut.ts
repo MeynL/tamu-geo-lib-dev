@@ -1,6 +1,6 @@
 var Earcut = {
 
-  triangulate: function ( data, holeIndices, dim ) {
+  triangulate: function ( data, holeIndices, dim? ) {
 
     dim = dim || 2;
 
@@ -77,7 +77,7 @@ function linkedList( data, start, end, dim, clockwise ) {
 
 // eliminate colinear or duplicate points
 
-function filterPoints( start, end ) {
+function filterPoints( start, end? ) {
 
   if ( ! start ) return start;
   if ( ! end ) end = start;
@@ -109,7 +109,7 @@ function filterPoints( start, end ) {
 
 // main ear slicing loop which triangulates a polygon (given as a linked list)
 
-function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
+function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass? ) {
 
   if ( ! ear ) return;
 

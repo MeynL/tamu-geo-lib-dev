@@ -36,7 +36,7 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
             new THREE.Vector3(i, j + data.height, 0),
             new THREE.Vector3(i, j, 0),
             new THREE.Vector3(i + data.width, j, 0),
-            new THREE.Vector3(i + data.width, j + data.height, 0)
+            new THREE.Vector3(i + data.width, j + data.height, 0),
           ]);
         } else {
           // 错位
@@ -44,7 +44,7 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
             new THREE.Vector3(i, j + data.height * 3 / 2, 0),
             new THREE.Vector3(i, j + data.height / 2, 0),
             new THREE.Vector3(i + data.width, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height * 3 / 2, 0)
+            new THREE.Vector3(i + data.width, j + data.height * 3 / 2, 0),
           ]);
         }
       }

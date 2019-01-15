@@ -45,11 +45,123 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
       });
     }
     this.vertices = [];
+    this.faces = [];
+    this.faceVertexUvs[0] = [];
     vertices.forEach(p => {
       if (p.length !== 4) {
         return;
       }
       this.buildFace(p[0], p[1], p[2], p[3]);
+    });
+  }
+
+  public buildHalfFace(subsection: number) {
+    this.halfs = [];
+    for (let i = 0; i < subsection; i++) {
+      this.halfs.push({
+        size: new THREE.Vector2(1 / subsection, 1),
+        pos: new THREE.Vector2(1 * i / subsection, 0),
+      });
+    }
+  }
+
+  public clearShape() {
+    this.vertices = [];
+    this.faces = [];
+    this.faceVertexUvs[0] = [];
+    this.uvStart = 0;
+  }
+
+  public addShapes(shapes) {
+    let i, l, shapeHole;
+
+    // let indexOffset = this.vertices.length / 3;
+    shapes.forEach(shape => {
+      let indexOffset = this.vertices.length;
+      this.uvStart = this.faceVertexUvs[0].length;
+      let points = shape.extractPoints(1);
+      let shapeVertices = points.shape;
+      let shapeHoles = points.holes;
+      let polyAxis = points.shape;
+      this.randomHalf();
+      if (ShapeUtils.isClockWise(polyAxis) === false) {
+        polyAxis = polyAxis.reverse();
+      }
+      console.log('shapev', JSON.stringify(shapeVertices));
+      console.log('hole', JSON.stringify(shapeHoles));
+
+      // check direction of vertices
+
+      if (ShapeUtils.isClockWise(shapeVertices) === false) {
+
+        shapeVertices = shapeVertices.reverse();
+
+      }
+
+      for (i = 0, l = shapeHoles.length; i < l; i++) {
+
+        shapeHole = shapeHoles[i];
+
+        if (ShapeUtils.isClockWise(shapeHole) === true) {
+
+          shapeHoles[i] = shapeHole.reverse();
+
+        }
+
+      }
+
+      let faces = ShapeUtils.triangulateShape(shapeVertices, shapeHoles);
+
+      // join vertices of inner and outer paths to a single array
+
+      for (i = 0, l = shapeHoles.length; i < l; i++) {
+
+        shapeHole = shapeHoles[i];
+        shapeVertices = shapeVertices.concat(shapeHole);
+
+      }
+      // let faces = [[3, 2, 1], [1, 0, 3]];
+      // console.log('sss', shapeVertices);
+
+      // vertices, normals, uvs
+
+      for (i = 0, l = shapeVertices.length; i < l; i++) {
+
+        let vertex = shapeVertices[i];
+
+        this.vertices.push(new THREE.Vector3(vertex.x, vertex.y, 0));
+        // this.normals.push( 0, 0, 1 );
+        // uvs.push( vertex.x, vertex.y ); // world uvs
+
+      }
+
+      // incides
+
+      for (i = 0, l = faces.length; i < l; i++) {
+
+        let face = faces[i];
+
+        let a = face[0] + indexOffset;
+        let b = face[1] + indexOffset;
+        let c = face[2] + indexOffset;
+
+        this.faces.push(new THREE.Face3(
+          a,
+          b,
+          c,
+          new THREE.Vector3(0, 0, 1)
+        ));
+
+        this.faceVertexUvs[0][this.uvStart] = [];
+        this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(this.vertices[a], polyAxis, this.half));
+        this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(this.vertices[b], polyAxis, this.half));
+        this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(this.vertices[c], polyAxis, this.half));
+        this.uvStart++;
+
+        // indices.push( a, b, c );
+        // groupCount += 3;
+
+      }
     });
   }
 
@@ -72,45 +184,42 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
       truePoints.push(p4);
     }
-    if (truePoints.length > 0) {
+    if (truePoints) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
       triangleList.forEach(triangle => {
         this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
       });
-    } else if (truePoints.length === 0) {
+    } else {
       let _face = this.threeVector2BuildPolyList([p1, p2, p3, p4]);
       let intersect = PolyBool.intersect({
         regions: [_face],
         inverted: false,
       }, {
         regions: [this.polyJson],
-        inverted: true,
+        inverted: false,
       });
       if (intersect.regions.length > 0) {
-        let allVers = [p1, p4, p3, p2];
-        intersect.regions = intersect.regions.map(reg => {
-          if (this.computePolyDirection(reg)) {
-            reg = this.changePolyDirection(reg);
-          }
-          allVers = allVers.concat(reg);
-          return reg;
-        });
-        let faces = ShapeUtils.triangulateShape([p1, p4, p3, p2], intersect.regions);
-        // let verts = [p1,p4,p3,p2].concat()
-        console.log('facve', faces);
-        faces.forEach(face => {
-          this.pushFace([allVers[face[0]], allVers[face[1]], allVers[face[2]]], this.half, [p1, p2, p3, p4]);
-        });
-        // let vecs = this.polyListBuildThreeVector2(intersect.regions[0]);
-        // if (!this.computePolyDirection(vecs)) {
-        //   vecs = this.changePolyDirection(vecs);
-        // }
-        // let triangleList = this.findTriangleFromPoly(vecs);
-        // triangleList.forEach(triangle => {
-        //   console.log('tri', triangle, [p1, p2, p3, p4]);
-        //   this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
+        // let allVers = [p1, p4, p3, p2];
+        // intersect.regions = intersect.regions.map(reg => {
+        //   if (this.computePolyDirection(reg)) {
+        //     reg = this.changePolyDirection(reg);
+        //   }
+        //   allVers = allVers.concat(reg);
+        //   return reg;
         // });
+        // let faces = ShapeUtils.triangulateShape([p1, p4, p3, p2], intersect.regions);
+        // faces.forEach(face => {
+        //   this.pushFace([allVers[face[0]], allVers[face[1]], allVers[face[2]]], this.half, [p1, p2, p3, p4]);
+        // });
+        let vecs = this.polyListBuildThreeVector2(intersect.regions[0]);
+        if (!this.computePolyDirection(vecs)) {
+          vecs = this.changePolyDirection(vecs);
+        }
+        let triangleList = this.findTriangleFromPoly(vecs);
+        triangleList.forEach(triangle => {
+          this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
+        });
       }
     }
   }
@@ -124,7 +233,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
       this.start + 0,
       this.start + 1,
       this.start + 2,
-      new THREE.Vector3(0, 1, 0), new THREE.Color('#FFFFFF'), 0));
+      new THREE.Vector3(0, 1, 0)));
     this.faceVertexUvs[0][this.uvStart] = [];
     this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[0], polyAxis, half));
     this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[1], polyAxis, half));
@@ -208,13 +317,12 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     lX = lX ? lX : 0;
     lY = lY ? lY : 0;
     uvPos = new THREE.Vector2(lX / lineX.distance() * uvTranslate.size.x + uvTranslate.pos.x, lY / lineY.distance() * uvTranslate.size.y + uvTranslate.pos.y);
-    console.log('pos', uvPos);
     return uvPos;
   }
 
   private findTriangleFromPoly(poly: any) {
     let triangleList = [];
-    for (let i = 0; i < poly.length - 1; i++) {
+    for (let i = 1; i < poly.length - 1; i++) {
       triangleList.push([poly[0], poly[i], poly[i + 1]]);
     }
     return triangleList;
