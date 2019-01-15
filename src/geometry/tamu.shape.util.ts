@@ -70,7 +70,7 @@ function removeDupEndPts( points ) {
 
   var l = points.length;
 
-  if ( l > 2 && points[ l - 1 ].equals( points[ 0 ] ) ) {
+  if ( l > 2 && points[ l - 1 ] === points[ 0 ] ) {
 
     points.pop();
 

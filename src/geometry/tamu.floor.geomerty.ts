@@ -1,5 +1,6 @@
 import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 import * as THREE from 'three';
+import {ShapeUtils} from './tamu.shape.util';
 import 'polybooljs';
 
 declare const PolyBool: any;
@@ -53,7 +54,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
   }
 
   private randomHalf() {
-    this.half =  this.halfs[Math.ceil(this.halfs.length * Math.random()) - 1];
+    this.half = this.halfs[Math.ceil(this.halfs.length * Math.random()) - 1];
   }
 
   private buildFace(p1: THREE.Vector3, p2: THREE.Vector3, p3: THREE.Vector3, p4: THREE.Vector3) {
@@ -71,31 +72,45 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
       truePoints.push(p4);
     }
-    if (truePoints.length === 4) {
+    if (truePoints.length > 0) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
       triangleList.forEach(triangle => {
         this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
       });
-    } else if (truePoints.length > 0) {
+    } else if (truePoints.length === 0) {
       let _face = this.threeVector2BuildPolyList([p1, p2, p3, p4]);
       let intersect = PolyBool.intersect({
         regions: [_face],
         inverted: false,
       }, {
         regions: [this.polyJson],
-        inverted: false,
+        inverted: true,
       });
       if (intersect.regions.length > 0) {
-        let vecs = this.polyListBuildThreeVector2(intersect.regions[0]);
-        if (!this.computePolyDirection(vecs)) {
-          vecs = this.changePolyDirection(vecs);
-        }
-        let triangleList = this.findTriangleFromPoly(vecs);
-        triangleList.forEach(triangle => {
-          console.log('tri', triangle, [p1, p2, p3, p4]);
-          this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
+        let allVers = [p1, p4, p3, p2];
+        intersect.regions = intersect.regions.map(reg => {
+          if (this.computePolyDirection(reg)) {
+            reg = this.changePolyDirection(reg);
+          }
+          allVers = allVers.concat(reg);
+          return reg;
         });
+        let faces = ShapeUtils.triangulateShape([p1, p4, p3, p2], intersect.regions);
+        // let verts = [p1,p4,p3,p2].concat()
+        console.log('facve', faces);
+        faces.forEach(face => {
+          this.pushFace([allVers[face[0]], allVers[face[1]], allVers[face[2]]], this.half, [p1, p2, p3, p4]);
+        });
+        // let vecs = this.polyListBuildThreeVector2(intersect.regions[0]);
+        // if (!this.computePolyDirection(vecs)) {
+        //   vecs = this.changePolyDirection(vecs);
+        // }
+        // let triangleList = this.findTriangleFromPoly(vecs);
+        // triangleList.forEach(triangle => {
+        //   console.log('tri', triangle, [p1, p2, p3, p4]);
+        //   this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
+        // });
       }
     }
   }
@@ -199,7 +214,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
 
   private findTriangleFromPoly(poly: any) {
     let triangleList = [];
-    for (let i = 1; i < poly.length - 1; i++) {
+    for (let i = 0; i < poly.length - 1; i++) {
       triangleList.push([poly[0], poly[i], poly[i + 1]]);
     }
     return triangleList;
