@@ -30,8 +30,6 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     let objs: THREE.Mesh[] = [];
     let matrixes = [];
     let center = TamuGeometryUtil.getCenter(vertices);
-    let _center;
-    console.log('center', center);
     vertices.forEach((ver: any, index: number) => {
       let geo = new TamuFloorGeometry(new THREE.Shape([
         new THREE.Vector2(ver[0].x, ver[0].y),
@@ -40,11 +38,9 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
         new THREE.Vector2(ver[3].x, ver[3].y),
       ]));
       geo.buldSingleFloor(data.subsection);
-      _center = TamuGeometryUtil.getCenter([geo.vertices]);
+      geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
+      let _center = TamuGeometryUtil.getCenter([geo.vertices]);
       if (index <= 2) {
-      //   geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z).makeRotationZ(-Math.PI / 4));
-      //   let mat = ;
-      //   let _mat = mat);
         matrixes.push(new THREE.Matrix4().getInverse(
           new THREE.Matrix4().makeTranslation(-_center.x, _center.y, _center.z).multiply(new THREE.Matrix4().makeRotationZ(-Math.PI / 4))));
       } else {
