@@ -6,7 +6,7 @@ export interface TamuBrickWorkBase {
    * @param size
    * @param isAnimate
    */
-  makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): {objs: THREE.Object3D[], positions: THREE.Vector3[]};
+  makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): {objs: THREE.Object3D[], materixes: THREE.Matrix4[]};
 
   /**
    * 返回按照形状拼好的地板object3D

@@ -25,23 +25,35 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     return plan;
   }
 
-  makeObjects(data: { width: number, height: number, subsection: number}, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; positions: THREE.Vector3[] } {
-    console.log('sss', data.width, data.height);
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 7, data.height * 5), 2);
+  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[]} {
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 7, data.height * 5), 5);
     let objs: THREE.Mesh[] = [];
-    vertices.forEach(ver => {
-      let geo = new TamuFloorGeometry(new THREE.Shape( [
+    let matrixes = [];
+    let center = TamuGeometryUtil.getCenter(vertices);
+    let _center;
+    console.log('center', center);
+    vertices.forEach((ver: any, index: number) => {
+      let geo = new TamuFloorGeometry(new THREE.Shape([
         new THREE.Vector2(ver[0].x, ver[0].y),
         new THREE.Vector2(ver[1].x, ver[1].y),
         new THREE.Vector2(ver[2].x, ver[2].y),
         new THREE.Vector2(ver[3].x, ver[3].y),
       ]));
       geo.buldSingleFloor(data.subsection);
-      // geo.center();
+      _center = TamuGeometryUtil.getCenter([geo.vertices]);
+      if (index <= 2) {
+      //   geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z).makeRotationZ(-Math.PI / 4));
+      //   let mat = ;
+      //   let _mat = mat);
+        matrixes.push(new THREE.Matrix4().getInverse(
+          new THREE.Matrix4().makeTranslation(-_center.x, _center.y, _center.z).multiply(new THREE.Matrix4().makeRotationZ(-Math.PI / 4))));
+      } else {
+        matrixes.push(new THREE.Matrix4().getInverse(
+          new THREE.Matrix4().makeTranslation(-_center.x, _center.y, _center.z).multiply(new THREE.Matrix4().makeRotationZ(Math.PI / 4))));
+      }
       objs.push(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({wireframe: true})));
-      console.log('geo', geo);
     });
-    return {objs: objs, positions: [new THREE.Vector3()]};
+    return {objs: objs, materixes: matrixes};
   }
 
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
@@ -50,7 +62,6 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     for (let j = start.y - data.height; j <= size.y; j += 3 * (data.width * Math.sqrt(2))) {
       for (let i = start.x - data.width; i <= size.x; i += (data.height / Math.sqrt(2))) {
         if (num === 0) return <any>pf;
-        if (num !== 0 && num) num--;
         let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
         if (next) {
           // 正常
@@ -60,6 +71,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, Math.PI / 4),
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, Math.PI / 4),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
           pf.push([
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2) / 2, -data.width * Math.sqrt(2) / 2, 0)),
@@ -70,6 +83,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2) / 2, -data.width * Math.sqrt(2) / 2, 0)),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
           pf.push([
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2), -data.width * Math.sqrt(2), 0)),
@@ -80,6 +95,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2), -data.width * Math.sqrt(2), 0)),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
         } else {
           // 错位
           pf.push([
@@ -92,6 +109,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, -Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2) * 2 / 2, -data.width * Math.sqrt(2) * 3 / 2, 0)),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
           pf.push([
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, -Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2) * 1 / 2, -data.width * Math.sqrt(2) * 4 / 2, 0)),
@@ -102,6 +121,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, -Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2) * 1 / 2, -data.width * Math.sqrt(2) * 4 / 2, 0)),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
           pf.push([
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, -Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2) * 0 / 2, -data.width * Math.sqrt(2) * 5 / 2, 0)),
@@ -112,6 +133,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, -Math.PI / 4)
               .add(new THREE.Vector3(-data.width * Math.sqrt(2) * 0 / 2, -data.width * Math.sqrt(2) * 5 / 2, 0)),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
         }
         next = !next;
       }

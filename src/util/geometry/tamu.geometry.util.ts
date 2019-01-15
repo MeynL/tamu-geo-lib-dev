@@ -39,8 +39,6 @@ export class TamuGeometryUtil {
     return shapeList;
   }
 
-  static buildUv(verticles: [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3])
-
   /**
    * 修改多边形的方向
    * @param poly
@@ -76,5 +74,19 @@ export class TamuGeometryUtil {
       vecList.push(new THREE.Vector2(point[0], point[1]));
     });
     return vecList;
+  }
+
+  static getCenter(vertice: THREE.Vector3[][]) {
+    let max, min;
+    vertice.forEach((ver: any) => {
+      ver.forEach((v: any) => {
+        if (max !== 0 && !max) max = new THREE.Vector3(v.x, v.y, v.z);
+        if (min !== 0 && !min) min = new THREE.Vector3(v.x, v.y, v.z);
+        max = new THREE.Vector3(Math.max(max.x, v.x), Math.max(max.y, v.y), Math.max(max.z, v.z));
+        min = new THREE.Vector3(Math.min(min.x, v.x), Math.min(min.y, v.y), Math.min(min.z, v.z));
+      });
+    });
+    // console.log('111', max.add(min));
+    return max.add(min).multiplyScalar(.5);
   }
 }
