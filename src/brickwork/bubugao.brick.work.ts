@@ -27,11 +27,16 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
 
   makeObjects(data: { width: number, height: number, subsection: number}, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; positions: THREE.Vector3[] } {
     console.log('sss', data.width, data.height);
-    let vertices = this.makeVertices(data, new THREE.Vector2(0, 0), new THREE.Vector2(data.width * 6, data.height * 4), 2);
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 7, data.height * 5), 2);
     let objs: THREE.Mesh[] = [];
     vertices.forEach(ver => {
-      let geo = new TamuFloorGeometry(new THREE.Shape());
-      geo.buldSingleFloor(ver, data.subsection);
+      let geo = new TamuFloorGeometry(new THREE.Shape( [
+        new THREE.Vector2(ver[0].x, ver[0].y),
+        new THREE.Vector2(ver[1].x, ver[1].y),
+        new THREE.Vector2(ver[2].x, ver[2].y),
+        new THREE.Vector2(ver[3].x, ver[3].y),
+      ]));
+      geo.buldSingleFloor(data.subsection);
       // geo.center();
       objs.push(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({wireframe: true})));
       console.log('geo', geo);
@@ -44,7 +49,7 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     let next = true;
     for (let j = start.y - data.height; j <= size.y; j += 3 * (data.width * Math.sqrt(2))) {
       for (let i = start.x - data.width; i <= size.x; i += (data.height / Math.sqrt(2))) {
-        if (num === 0) return pf;
+        if (num === 0) return <any>pf;
         if (num !== 0 && num) num--;
         let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
         if (next) {
@@ -111,7 +116,7 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
         next = !next;
       }
     }
-    return pf;
+    return <any>pf;
   }
 
 }

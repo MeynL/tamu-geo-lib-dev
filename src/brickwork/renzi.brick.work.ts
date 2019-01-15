@@ -44,14 +44,14 @@ export class RenziBrickWork implements TamuBrickWorkBase {
           pf.push([
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, -Math.PI / 4).add(new THREE.Vector3(0, -data.width * Math.sqrt(2) / 2, 0)),
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j, 0), center, -Math.PI / 4).add(new THREE.Vector3(0, -data.width * Math.sqrt(2) / 2, 0)),
-            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, -Math.PI / 4).add(new THREE.Vector3(0, - data.width * Math.sqrt(2)/ 2, 0)),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, -Math.PI / 4).add(new THREE.Vector3(0, -data.width * Math.sqrt(2) / 2, 0)),
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, -Math.PI / 4).add(new THREE.Vector3(0, -data.width * Math.sqrt(2) / 2, 0)),
           ]);
         }
       }
       next = !next;
     }
-    return pf;
+    return <any>pf;
   }
 
 }

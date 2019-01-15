@@ -50,6 +50,6 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
       }
       next = !next;
     }
-    return pf;
+    return <any>pf;
   }
 }

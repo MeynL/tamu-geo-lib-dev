@@ -104,16 +104,16 @@ export class FlooringplanUtil {
    * @param points Is array of points with x,y attributes
    * @returns True if clockwise.
    */
-  static isClockwise(points): boolean {
+  static isClockwise(points: any): boolean {
     // make positive
-    let tSubX = Math.min(0, Math.min.apply(null, FlooringplanUtil.map(points, (p) => {
+    let tSubX = Math.min(0, Math.min.apply(null, FlooringplanUtil.map(points, (p: any) => {
       return p.x;
     })));
-    let tSubY = Math.min(0, Math.min.apply(null, FlooringplanUtil.map(points, (p) => {
+    let tSubY = Math.min(0, Math.min.apply(null, FlooringplanUtil.map(points, (p: any) => {
       return p.x;
     })));
 
-    let tNewPoints = FlooringplanUtil.map(points, (p) => {
+    let tNewPoints = FlooringplanUtil.map(points, (p: any) => {
       return {
         x: p.x - tSubX,
         y: p.y - tSubY
@@ -151,7 +151,7 @@ export class FlooringplanUtil {
   }
 
   /** both arguments are arrays of corners with x,y attributes */
-  static polygonPolygonIntersect(firstCorners, secondCorners): boolean {
+  static polygonPolygonIntersect(firstCorners: any, secondCorners: any): boolean {
     for (let tI = 0; tI < firstCorners.length; tI++) {
       let tFirstCorner = firstCorners[tI],
         tSecondCorner;
@@ -173,7 +173,7 @@ export class FlooringplanUtil {
   }
 
   /** Corners is an array of points with x,y attributes */
-  static linePolygonIntersect(x1: number, y1: number, x2: number, y2: number, corners): boolean {
+  static linePolygonIntersect(x1: number, y1: number, x2: number, y2: number, corners: any): boolean {
     for (let tI = 0; tI < corners.length; tI++) {
       let tFirstCorner = corners[tI],
         tSecondCorner;
@@ -201,7 +201,7 @@ export class FlooringplanUtil {
     return (this.tCCW(tP1, tP3, tP4) !== this.tCCW(tP2, tP3, tP4)) && (this.tCCW(tP1, tP2, tP3) !== this.tCCW(tP1, tP2, tP4));
   }
 
-  static tCCW(p1, p2, p3) {
+  static tCCW(p1: any, p2: any, p3: any) {
     let tA = p1.x,
       tB = p1.y,
       tC = p2.x,
@@ -219,12 +219,8 @@ export class FlooringplanUtil {
       && (c = !c);
     return c;
   }*/
-  /**
-   @param corners Is an array of points with x,y attributes
-   @param startX X start coord for raycast
-   @param startY Y start coord for raycast
-   */
-  static pointInPolygon(x: number, y: number, corners, startX?: number, startY?: number): boolean {
+
+  static pointInPolygon(x: number, y: number, corners: any, startX?: number, startY?: number): boolean {
     startX = 99999;
     startY = 99999;
     // ensure that point(startX, startY) is outside the polygon consists of corners
@@ -272,12 +268,7 @@ export class FlooringplanUtil {
 
   }
 
-  /**
-   @param corners Is an array of points with x,y attributes
-   @param startX X start coord for raycast
-   @param startY Y start coord for raycast
-   */
-  static pointInPolygon2(x: number, y: number, corners, startX?: number, startY?: number): boolean {
+  static pointInPolygon2(x: number, y: number, corners: any, startX?: number, startY?: number): boolean {
     // startX = startX || 0;
     // startY = startY || 0;
 
@@ -315,7 +306,7 @@ export class FlooringplanUtil {
   }
 
   /** Checks if all corners of insideCorners are inside the polygon described by outsideCorners */
-  static polygonInsidePolygon(insideCorners, outsideCorners, startX: number, startY: number): boolean {
+  static polygonInsidePolygon(insideCorners: any, outsideCorners: any, startX: number, startY: number): boolean {
     startX = startX || 0;
     startY = startY || 0;
 
@@ -331,7 +322,7 @@ export class FlooringplanUtil {
   }
 
   /** Checks if any corners of firstCorners is inside the polygon described by secondCorners */
-  static polygonOutsidePolygon(insideCorners, outsideCorners, startX?: number, startY?: number): boolean {
+  static polygonOutsidePolygon(insideCorners: any, outsideCorners: any, startX?: number, startY?: number): boolean {
     startX = startX || 0;
     startY = startY || 0;
 
@@ -347,30 +338,30 @@ export class FlooringplanUtil {
   }
 
   // arrays
-  static forEach(array, action) {
+  static forEach(array: any, action: any) {
     for (let tI = 0; tI < array.length; tI++) {
       action(array[tI]);
     }
   }
 
-  static forEachIndexed(array, action) {
+  static forEachIndexed(array: any, action: any) {
     for (let tI = 0; tI < array.length; tI++) {
       action(tI, array[tI]);
     }
   }
 
-  static map(array, func) {
-    let tResult = [];
-    array.forEach((element) => {
+  static map(array: any, func: any) {
+    let tResult: any = [];
+    array.forEach((element: any) => {
       tResult.push(func(element));
     });
     return tResult;
   }
 
   /** Remove elements in array if func(element) returns true */
-  static removeIf(array, func) {
-    let tResult = [];
-    array.forEach((element) => {
+  static removeIf(array: any, func: any) {
+    let tResult: any = [];
+    array.forEach((element: any) => {
       if (!func(element)) {
         tResult.push(element);
       }
@@ -379,7 +370,7 @@ export class FlooringplanUtil {
   }
 
   /** Shift the items in an array by shift (positive integer) */
-  static cycle(arr, shift) {
+  static cycle(arr: any, shift: any) {
     let tReturn = arr.slice(0);
     for (let tI = 0; tI < shift; tI++) {
       let tmp = tReturn.shift();
@@ -389,7 +380,7 @@ export class FlooringplanUtil {
   }
 
   /** Returns in the unique elemnts in arr */
-  static unique(arr, hashFunc) {
+  static unique(arr: any, hashFunc: any) {
     let tResults = [];
     let tMap = {};
     for (let tI = 0; tI < arr.length; tI++) {
@@ -402,7 +393,7 @@ export class FlooringplanUtil {
   }
 
   /** Remove value from array, if it is present */
-  static removeValue(array, value) {
+  static removeValue(array: any, value: any) {
     for (let tI = array.length - 1; tI >= 0; tI--) {
       if (array[tI] === value) {
         array.splice(tI, 1);
@@ -411,7 +402,7 @@ export class FlooringplanUtil {
   }
 
   /** Checks if value is in array */
-  static hasValue(array, value): boolean {
+  static hasValue(array: any, value: any): boolean {
     for (let tI = 0; tI < array.length; tI++) {
       if (array[tI] === value) {
         return true;
@@ -427,7 +418,7 @@ export class FlooringplanUtil {
       });
   }*/
 
-  static moveOnAxis(x, y, v1, v2, distance): { x: number, y: number } {
+  static moveOnAxis(x: any, y: any, v1: any, v2: any, distance: any): { x: number, y: number } {
     let v1v2 = Math.sqrt(v1 * v1 + v2 * v2);
     let temp = distance / v1v2;
     let v1_1 = v1 * temp;
@@ -435,7 +426,7 @@ export class FlooringplanUtil {
     return {x: v1_1 + x, y: v2_1 + y};
   }
 
-  static rotateCornerZ(c1, c2, angle): THREE.Vector3 {
+  static rotateCornerZ(c1: any, c2: any, angle: any): THREE.Vector3 {
     let x = (c1.x - c2.x) * Math.cos(angle) - (c1.y - c2.y) * Math.sin(angle) + c2.x;
     let y = (c1.y - c2.y) * Math.cos(angle) + (c1.x - c2.x) * Math.sin(angle) + c2.y;
     return new THREE.Vector3(x, y, 0);
