@@ -6,26 +6,26 @@ declare const PolyBool: any;
 
 export class HalfFace {
   public size: THREE.Vector2;
-  public origin: THREE.Vector2;
+  public pos: THREE.Vector2;
 }
 
 export class TamuFloorGeometry extends THREE.ShapeGeometry {
-  private halfs: HalfFace[];
+  private halfs: HalfFace[] = [];
   private start = 0;
   private uvStart = 0;
+  private half;
 
   private poly;
   private polyJson: any;
 
   constructor(private shape: THREE.Shape) {
     super(shape);
-    // console.log('shape', shape.getPointsHoles(1));
     this.poly = this.vertices.concat(this.vertices[0]);
     this.polyJson = this.threeVector2BuildPolyList(this.poly);
-    this.halfs = [{
-      size: new THREE.Vector2(1, 1),
-      origin: new THREE.Vector2(0, 0),
-    }];
+    // this.halfs = [{
+    //   size: new THREE.Vector2(1, 1),
+    //   pos: new THREE.Vector2(0, 0),
+    // }];
   }
 
   /**
@@ -37,7 +37,12 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
    * @param subsection 几拼图
    */
   public generateFaceUV(vertices: [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][], subsection: number) {
-    // let truePoints = [];
+    for (let i = 0; i < subsection; i++) {
+      this.halfs.push({
+        size: new THREE.Vector2(1 / subsection, 1),
+        pos: new THREE.Vector2(1 * i / subsection, 0),
+      });
+    }
     this.vertices = [];
     vertices.forEach(p => {
       if (p.length !== 4) {
@@ -47,33 +52,30 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     });
   }
 
-  private randomHalf(): HalfFace {
-    return this.halfs[Math.ceil(this.halfs.length * Math.random())];
+  private randomHalf() {
+    this.half =  this.halfs[Math.ceil(this.halfs.length * Math.random()) - 1];
   }
 
   private buildFace(p1: THREE.Vector3, p2: THREE.Vector3, p3: THREE.Vector3, p4: THREE.Vector3) {
+    this.randomHalf();
     let truePoints: THREE.Vector3[] = [];
     if (FlooringplanUtil.pointInPolygon2(p1.x, p1.y, this.poly)) {
       truePoints.push(p1);
     }
     if (FlooringplanUtil.pointInPolygon2(p2.x, p2.y, this.poly)) {
-      // if (this.pointInPoly(p2, this.poly)) {
       truePoints.push(p2);
     }
     if (FlooringplanUtil.pointInPolygon2(p3.x, p3.y, this.poly)) {
-      // if (this.pointInPoly(p3, this.poly)) {
       truePoints.push(p3);
     }
     if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
-      // if (this.pointInPoly(p4, this.poly)) {
       truePoints.push(p4);
     }
-    console.log('111', truePoints);
     if (truePoints.length === 4) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
       triangleList.forEach(triangle => {
-        this.pushFace(triangle, this.randomHalf(), [p1, p2, p3, p4]);
+        this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
       });
     } else if (truePoints.length > 0) {
       let _face = this.threeVector2BuildPolyList([p1, p2, p3, p4]);
@@ -91,7 +93,8 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
         }
         let triangleList = this.findTriangleFromPoly(vecs);
         triangleList.forEach(triangle => {
-          this.pushFace(triangle, this.randomHalf(), [p1, p2, p3, p4]);
+          console.log('tri', triangle, [p1, p2, p3, p4]);
+          this.pushFace(triangle, this.half, [p1, p2, p3, p4]);
         });
       }
     }
@@ -108,18 +111,9 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
       this.start + 2,
       new THREE.Vector3(0, 1, 0), new THREE.Color('#FFFFFF'), 0));
     this.faceVertexUvs[0][this.uvStart] = [];
-    this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[0], polyAxis, {
-      size: new THREE.Vector2(.5, 1),
-      pos: new THREE.Vector2(.5, 0)
-    }));
-    this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[1], polyAxis, {
-      size: new THREE.Vector2(.5, 1),
-      pos: new THREE.Vector2(.5, 0)
-    }));
-    this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[2], polyAxis, {
-      size: new THREE.Vector2(.5, 1),
-      pos: new THREE.Vector2(.5, 0)
-    }));
+    this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[0], polyAxis, half));
+    this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[1], polyAxis, half));
+    this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[2], polyAxis, half));
     this.uvStart++;
     this.start += 3;
   }
@@ -199,12 +193,13 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     lX = lX ? lX : 0;
     lY = lY ? lY : 0;
     uvPos = new THREE.Vector2(lX / lineX.distance() * uvTranslate.size.x + uvTranslate.pos.x, lY / lineY.distance() * uvTranslate.size.y + uvTranslate.pos.y);
+    console.log('pos', uvPos);
     return uvPos;
   }
 
   private findTriangleFromPoly(poly: any) {
     let triangleList = [];
-    for (let i = 0; i < poly.length - 1; i++) {
+    for (let i = 1; i < poly.length - 1; i++) {
       triangleList.push([poly[0], poly[i], poly[i + 1]]);
     }
     return triangleList;

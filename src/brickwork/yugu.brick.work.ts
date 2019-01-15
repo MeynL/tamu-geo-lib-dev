@@ -3,7 +3,7 @@ import {AnimationBase} from '../animation/base/animation.base';
 import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
 import * as THREE from 'three';
 
-export class Oo2BrickWork implements TamuBrickWorkBase {
+export class YuguBrickWork implements TamuBrickWorkBase {
   private animationUtil: AnimationBase;
 
   constructor() {
@@ -29,7 +29,7 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     let pf = [];
     let next = true;
     for (let i = start.x - data.width; i <= size.x; i += data.width) {
-      for (let j = start.y - data.height; j <= size.y; j += data.height) {
+      for (let j = start.y - data.height - data.height / 2; j <= size.y; j += data.height) {
         if (next) {
           // 正常
           pf.push([
@@ -52,4 +52,5 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     }
     return pf;
   }
+
 }

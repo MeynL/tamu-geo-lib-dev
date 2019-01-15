@@ -10,11 +10,11 @@ export interface TamuBrickWorkBase {
   makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): {objs: THREE.Object3D[], positions: THREE.Vector3[]};
 
   /**
-   * 返回按照大小拼好的地板object3D
+   * 返回按照形状拼好的地板object3D
    * @param data
    * @returns {THREE.Object3D}
    */
-  makeObject(data: any, size: THREE.Vector2): THREE.Object3D;
+  makeObject(data: any, shape: THREE.Shape): THREE.Object3D;
 
   /**
    * 根据大小计算拼法
@@ -22,5 +22,5 @@ export interface TamuBrickWorkBase {
    * @param {THREE.Vector2} size
    * @returns {THREE.Vector2[]}
    */
-  makeVertices(data: any, size: THREE.Vector2): THREE.Vector2[];
+  makeVertices(data: any, start: THREE.Vector2, size: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][];
 }
