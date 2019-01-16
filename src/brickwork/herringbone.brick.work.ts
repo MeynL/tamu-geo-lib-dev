@@ -7,7 +7,7 @@ import * as THREE from 'three';
 
 export class HerringboneBrickWork implements TamuBrickWorkBase {
 
-  public version = 'herringbone';
+  public version = 'diamond';
 
   private animationUtil: AnimationBase;
 
@@ -27,7 +27,7 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, data.height), 5);
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, data.height), new THREE.Vector2(4, 2));
     let objs: THREE.Mesh[] = [];
     let matrixes = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -41,30 +41,39 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
       geo.buldSingleFloor(data.subsection);
       geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
       let _center = TamuGeometryUtil.getCenter([geo.vertices]);
-      matrixes.push(new THREE.Matrix4().getInverse(
-        new THREE.Matrix4().makeTranslation(-_center.x, _center.y, _center.z)));
+      if (index > 1) {
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        // mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(-Math.PI / 2), mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
+      } else {
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(-Math.PI / 2), mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
+      }
+      // matrixes.push(new THREE.Matrix4().getInverse(
+      //   new THREE.Matrix4().makeTranslation(-_center.x, _center.y, _center.z)));
       objs.push(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({wireframe: true})));
     });
     return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
     let move = 0;
     let muip = Math.floor(data.height / data.width);
     let desm = data.height - (muip * data.width);
     let des = 0;
-    // num = 5;
-    // start.x = data.width;
-    // start.y = data.height;
-    // size.x = data.width;
-    // size.y = data.height;
+    let count;
+    // num = new THREE.Vector2(4, 2);
+    if (num) {
+      count = num.y;
+    }
     for (let i = start.x - size.x; i <= size.x + data.width; i += next ? (muip * data.width) : (data.height)) {
       for (let j = start.y - data.height; j <= size.y + data.height; j += data.width) {
-        if (num === 0) return <any>pf;
+        if (num && num.x === 0) return <any>pf;
+        if (num && count === 0) continue;
         if (next) {
-          console.log('i', i);
           // 正常
           pf.push([
             new THREE.Vector3(i + data.height + move, j + data.width - des, 0),
@@ -73,8 +82,12 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
             new THREE.Vector3(i + data.height + move, j - des, 0),
           ]);
           move += data.width;
-          if (num !== 0 && num) num--;
-          if (num === 0) return <any>pf;
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
         } else {
           let center = new THREE.Vector3(i + (data.width / 2) + move, j + (data.width / 2) - des, 0);
           // 错位
@@ -85,10 +98,15 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.height + move, j - des, 0), center, -Math.PI / 2),
           ]);
           move += data.width;
-          if (num !== 0 && num) num--;
-          if (num === 0) return <any>pf;
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
         }
       }
+      if (num) count = num.y;
       des += next ? 0 : desm;
       move = 0;
       next = !next;
