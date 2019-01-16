@@ -6,6 +6,7 @@ export class AnimationBase {
   public myAnimation: any;
 
   public tweenObjsByPosition(objs: THREE.Object3D[], endPositions: THREE.Vector3[], duration?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
       this.animateList.push(tween({
         from: obj.position.toArray(),
@@ -30,9 +31,8 @@ export class AnimationBase {
   }
 
   public tweenObjsByMatrix(objs: THREE.Object3D[], endMats: THREE.Matrix4[], duration?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
-      console.log(endMats[index]);
-      console.log(index);
       this.animateList.push(tween({
         from: obj.matrix.toArray(),
         to: endMats[index].toArray(),
@@ -60,6 +60,7 @@ export class AnimationBase {
   }
 
   public springByPosition(objs: THREE.Object3D[], endPositions: THREE.Vector3[], stiffness?: any, damping?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
       this.animateList.push(spring({
         from: obj.position.toArray(),
@@ -85,6 +86,7 @@ export class AnimationBase {
   }
 
   public springByMatrix(objs: THREE.Object3D[], endMats: THREE.Matrix4[], stiffness?: any, damping?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
       this.animateList.push(spring({
         from: obj.matrixWorld.toArray(),
