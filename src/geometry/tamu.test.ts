@@ -1,3 +1,4 @@
+/*
 import { ShapeUtils } from './tamu.shape.util';
 export class TamuTest {
   constructor() {
@@ -5,3 +6,4 @@ export class TamuTest {
 
   }
 }
+*/
