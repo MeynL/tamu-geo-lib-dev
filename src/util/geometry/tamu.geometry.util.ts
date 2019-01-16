@@ -35,7 +35,6 @@ export class TamuGeometryUtil {
         shapeList.push(shape);
       }
     });
-    console.log('sh', shapeList);
     return shapeList;
   }
 
@@ -86,7 +85,6 @@ export class TamuGeometryUtil {
         min = new THREE.Vector3(Math.min(min.x, v.x), Math.min(min.y, v.y), Math.min(min.z, v.z));
       });
     });
-    // console.log('111', max.add(min));
     return max.add(min).multiplyScalar(.5);
   }
 }

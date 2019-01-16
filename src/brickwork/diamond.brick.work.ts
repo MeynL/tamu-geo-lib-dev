@@ -58,7 +58,7 @@ export class DiamondBrickWork implements TamuBrickWorkBase {
     let pf = [];
     let next = true;
     let count;
-    num = new THREE.Vector2(4, 2);
+    // num = new THREE.Vector2(4, 2);
     if (num) {
       count = num.y;
     }

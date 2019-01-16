@@ -18,7 +18,6 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
-    console.log('size', size);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
     geometry.generateFaceUV(vertices, data.subsection);
     // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());

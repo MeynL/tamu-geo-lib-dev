@@ -100,8 +100,6 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
       // if (ShapeUtils.isClockWise(polyAxis) === false) {
       //   polyAxis = polyAxis.reverse();
       // }
-      console.log('shapev', JSON.stringify(shapeVertices));
-      console.log('hole', JSON.stringify(shapeHoles));
 
       // check direction of vertices
 
@@ -134,7 +132,6 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
 
       }
       // let faces = [[3, 2, 1], [1, 0, 3]];
-      // console.log('sss', shapeVertices);
 
       // vertices, normals, uvs
 
@@ -197,8 +194,8 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
       truePoints.push(p4);
     }
-    // if (truePoints.length === 4) {
-    if (truePoints) {
+    if (truePoints.length === 4) {
+    // if (truePoints) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
       triangleList.forEach(triangle => {
