@@ -6,15 +6,16 @@ export class AnimationBase {
   public myAnimation: any;
 
   public tweenObjsByPosition(objs: THREE.Object3D[], endPositions: THREE.Vector3[], duration?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
       this.animateList.push(tween({
         from: obj.position.toArray(),
         to: endPositions[index].toArray(),
-        duration: duration ? duration : 2000,
+        duration: duration ? duration : 3000,
         ease: easing.circIn
       }));
     });
-    this.myAnimation = stagger(this.animateList, 100)
+    this.myAnimation = stagger(this.animateList, 800)
       .start({
         complete: () => {
           if (finishCallBack) {
@@ -30,6 +31,7 @@ export class AnimationBase {
   }
 
   public tweenObjsByMatrix(objs: THREE.Object3D[], endMats: THREE.Matrix4[], duration?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
       this.animateList.push(tween({
         from: obj.matrix.toArray(),
@@ -58,15 +60,17 @@ export class AnimationBase {
   }
 
   public springByPosition(objs: THREE.Object3D[], endPositions: THREE.Vector3[], stiffness?: any, damping?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
       this.animateList.push(spring({
         from: obj.position.toArray(),
         to: endPositions[index].toArray(),
-        stiffness: stiffness ? stiffness : 100,
+        stiffness: stiffness ? stiffness : 200,
         damping: damping ? damping : 10,
+        velocity: 10
       }));
     });
-    this.myAnimation = stagger(this.animateList, 100)
+    this.myAnimation = stagger(this.animateList, 500)
       .start({
         complete: () => {
           if (finishCallBack) {
@@ -82,12 +86,23 @@ export class AnimationBase {
   }
 
   public springByMatrix(objs: THREE.Object3D[], endMats: THREE.Matrix4[], stiffness?: any, damping?: any, finishCallBack?: any) {
+    this.animateList = [];
     objs.forEach((obj, index) => {
       this.animateList.push(spring({
-        from: obj.matrix.toArray(),
+        from: obj.matrixWorld.toArray(),
         to: endMats[index].toArray(),
-        stiffness: stiffness ? stiffness : 100,
-        damping: damping ? damping : 10,
+        stiffness: stiffness ? stiffness : [100, 100, 100,
+          100, 100, 100,
+          100, 100, 100],
+        damping: damping ? damping : [10, 10, 10,
+          10, 10, 10,
+          10, 10, 10],
+       /* mass: [1, 1, 1,
+          1, 1, 1,
+          1, 1, 1],
+        velocity: [0, 0, 0,
+          0, 0, 0,
+          0, 0, 0]*/
       }));
     });
     this.myAnimation = stagger(this.animateList, 100)
