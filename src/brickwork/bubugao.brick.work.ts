@@ -64,16 +64,10 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     let pf = [];
     let next = true;
     let count;
-    // let totle = num ? (num.x + num.y) : null;
     // num = new THREE.Vector2(5, 3);
     if (num) {
       count = num.y;
     }
-    // num = 3;
-    // start.x = data.width;
-    // start.y = data.height;
-    // size.x = 0;
-    // size.y = -2 * data.height + 3 * (data.width * Math.sqrt(2));
     for (let i = start.x - data.width; i <= size.x + (2 * data.width); i += (data.height / Math.sqrt(2))) {
       for (let j = start.y - data.height; j <= size.y + (2 * data.height); j += 3 * (data.width * Math.sqrt(2))) {
         let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);

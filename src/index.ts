@@ -7,4 +7,6 @@ export * from './brickwork/spare.brick.work';
 export * from './brickwork/diamond.brick.work';
 export * from './brickwork/miniGrid.brick.work';
 export * from './brickwork/herringbone.brick.work';
+export * from './brickwork/inline.brick.work';
+export * from './brickwork/oneOfThree.brick.work';
 export * from './animation/base/animation.base';
