@@ -23,6 +23,7 @@
   "private": true,
   "scripts": {
     "start": "gulp build",
+    "build": "gulp build",
     "test": " gulp test",
     "demo": " gulp build:demo",
     "check-travis": " travis-status --repo=MeynL/MeynL --branch=master --fail-pending || echo 'Not yet passing'"

@@ -76,7 +76,7 @@ export class TamuGeometryUtil {
   }
 
   static getCenter(vertice: THREE.Vector3[][]) {
-    let max, min;
+    let max: any, min: any;
     vertice.forEach((ver: any) => {
       ver.forEach((v: any) => {
         if (max !== 0 && !max) max = new THREE.Vector3(v.x, v.y, v.z);
