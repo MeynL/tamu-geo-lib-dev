@@ -6,20 +6,23 @@ import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
 export class RenziBrickWork implements TamuBrickWorkBase {
+  public version = 'renzi';
+
   private animationUtil: AnimationBase;
 
-  constructor() {
+  constructor(version?) {
+    if (version) this.version = version;
   }
 
-  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Mesh {
+  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Geometry {
     let geometry = new TamuFloorGeometry(shape);
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
     geometry.generateFaceUV(vertices, data.subsection);
-    let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
-    return plan;
+    // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
+    return geometry;
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
@@ -54,8 +57,8 @@ export class RenziBrickWork implements TamuBrickWorkBase {
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
-    for (let j = start.y - data.height; j <= size.y; j += (data.width * Math.sqrt(2))) {
-      for (let i = start.x - data.width; i <= size.x; i += (data.height / Math.sqrt(2))) {
+    for (let i = start.x - data.width; i <= size.x + data.width; i += (data.height / Math.sqrt(2))) {
+      for (let j = start.y - data.height; j <= size.y + data.height; j += (data.width * Math.sqrt(2))) {
         let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
         if (num === 0) return <any>pf;
         if (next) {
@@ -65,6 +68,10 @@ export class RenziBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j, 0), center, Math.PI / 4),
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, Math.PI / 4),
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, Math.PI / 4),
+            // new THREE.Vector3(i, j + data.height, 0),
+            // new THREE.Vector3(i, j, 0),
+            // new THREE.Vector3(i + data.width, j, 0),
+            // new THREE.Vector3(i + data.width, j + data.height, 0),
           ]);
           if (num !== 0 && num) num--;
           if (num === 0) return <any>pf;
@@ -79,8 +86,8 @@ export class RenziBrickWork implements TamuBrickWorkBase {
           if (num !== 0 && num) num--;
           if (num === 0) return <any>pf;
         }
-        next = !next;
       }
+      next = !next;
     }
     return <any>pf;
   }

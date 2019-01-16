@@ -1,11 +1,13 @@
 import {TamuBrickWorkBase} from './base/tamu.brick.work.base';
 import {AnimationBase} from '../animation/base/animation.base';
 import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
+import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
-export class Oo2BrickWork implements TamuBrickWorkBase {
-  public version = '1of2';
+export class MiniGridBrickWork implements TamuBrickWorkBase {
+
+  public version = 'mini_grid';
 
   private animationUtil: AnimationBase;
 
@@ -18,7 +20,6 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
-    console.log('size', size);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
     geometry.generateFaceUV(vertices, data.subsection);
     // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
@@ -49,33 +50,24 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
 
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
-    let next = true;
+    // num = 5;
+    // start.x = data.width;
+    // start.y = data.height;
+    // size.x = data.width;
+    // size.y = data.height * 2;
     for (let i = start.x - data.width; i <= size.x; i += data.width) {
       for (let j = start.y - data.height; j <= size.y; j += data.height) {
         if (num === 0) return <any>pf;
-        if (next) {
-          // 正常
-          pf.push([
-            new THREE.Vector3(i, j + data.height, 0),
-            new THREE.Vector3(i, j, 0),
-            new THREE.Vector3(i + data.width, j, 0),
-            new THREE.Vector3(i + data.width, j + data.height, 0),
-          ]);
-          if (num !== 0 && num) num--;
-          if (num === 0) return <any>pf;
-        } else {
-          // 错位
-          pf.push([
-            new THREE.Vector3(i, j + data.height * 3 / 2, 0),
-            new THREE.Vector3(i, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height * 3 / 2, 0),
-          ]);
-          if (num !== 0 && num) num--;
-          if (num === 0) return <any>pf;
-        }
+        // 正常
+        pf.push([
+          new THREE.Vector3(i, j + data.height, 0),
+          new THREE.Vector3(i, j, 0),
+          new THREE.Vector3(i + data.width, j, 0),
+          new THREE.Vector3(i + data.width, j + data.height, 0),
+        ]);
+        if (num !== 0 && num) num--;
+        if (num === 0) return <any>pf;
       }
-      next = !next;
     }
     return <any>pf;
   }

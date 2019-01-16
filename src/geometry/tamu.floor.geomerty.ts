@@ -197,7 +197,8 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
       truePoints.push(p4);
     }
-    if (truePoints.length === 4) {
+    // if (truePoints.length === 4) {
+    if (truePoints) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
       triangleList.forEach(triangle => {
@@ -246,7 +247,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
       this.start + 0,
       this.start + 1,
       this.start + 2,
-      new THREE.Vector3(0, 1, 0)));
+      new THREE.Vector3(0, 0, 1)));
     this.faceVertexUvs[0][this.uvStart] = [];
     this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[0], polyAxis, half));
     this.faceVertexUvs[0][this.uvStart].push(this.findUvPosition(pointList[1], polyAxis, half));

@@ -6,12 +6,14 @@ import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
 export class BubugaoBrickWork implements TamuBrickWorkBase {
+  public version = 'bubugao';
   private animationUtil: AnimationBase;
 
-  constructor() {
+  constructor(version?) {
+    if (version) this.version = version;
   }
 
-  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Mesh {
+  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Geometry {
     let geometry = new TamuFloorGeometry(shape);
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
@@ -21,11 +23,11 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     // let points = shape.extractPoints(1);
     // let shapes = TamuGeometryUtil.buildShape(vertices, (<any>points).shape);
     geometry.generateFaceUV(vertices, data.subsection);
-    let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
-    return plan;
+    // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
+    return geometry;
   }
 
-  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[], center: any} {
+  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[], center: any } {
     let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 7, data.height * 5), 5);
     let objs: THREE.Mesh[] = [];
     let matrixes = [];
@@ -61,8 +63,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
-    for (let j = start.y - data.height; j <= size.y; j += 3 * (data.width * Math.sqrt(2))) {
-      for (let i = start.x - data.width; i <= size.x; i += (data.height / Math.sqrt(2))) {
+    for (let i = start.x - data.width; i <= size.x + (2 * data.width); i += (data.height / Math.sqrt(2))) {
+      for (let j = start.y - data.height; j <= size.y + (2 * data.height); j += 3 * (data.width * Math.sqrt(2))) {
         if (num === 0) return <any>pf;
         let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
         if (next) {
@@ -138,8 +140,8 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
           if (num !== 0 && num) num--;
           if (num === 0) return <any>pf;
         }
-        next = !next;
       }
+      next = !next;
     }
     return <any>pf;
   }

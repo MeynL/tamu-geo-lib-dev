@@ -9,16 +9,15 @@ export class YuguBrickWork implements TamuBrickWorkBase {
   constructor() {
   }
 
-  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Mesh {
+  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Geometry {
     let geometry = new TamuFloorGeometry(shape);
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
-    console.log('size', size);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
     geometry.generateFaceUV(vertices, data.subsection);
-    let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
-    return plan;
+    // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
+    return geometry;
   }
 
   makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {

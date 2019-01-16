@@ -4,8 +4,8 @@ import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
-export class Oo2BrickWork implements TamuBrickWorkBase {
-  public version = '1of2';
+export class SpareBrickWork implements TamuBrickWorkBase {
+  public version = 'brickwork_spare';
 
   private animationUtil: AnimationBase;
 
@@ -13,20 +13,19 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     if (version) this.version = version;
   }
 
-  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Geometry {
+  makeObject(data: any, shape: THREE.Shape): THREE.Geometry {
     let geometry = new TamuFloorGeometry(shape);
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
-    console.log('size', size);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
     geometry.generateFaceUV(vertices, data.subsection);
     // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
     return geometry;
   }
 
-  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, data.height * 2), 5);
+  makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 2, data.height * 2), 5);
     let objs: THREE.Mesh[] = [];
     let matrixes = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -47,11 +46,16 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: any, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
-    for (let i = start.x - data.width; i <= size.x; i += data.width) {
-      for (let j = start.y - data.height; j <= size.y; j += data.height) {
+    // num = 5;
+    // start.x = data.width;
+    // start.y = data.height;
+    // size.x = data.width * 2;
+    // size.y = data.width * 2;
+    for (let j = start.y - data.height; j <= size.y; j += data.height) {
+      for (let i = start.x - data.width; i <= size.x; i += data.width) {
         if (num === 0) return <any>pf;
         if (next) {
           // 正常
@@ -66,10 +70,10 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
         } else {
           // 错位
           pf.push([
-            new THREE.Vector3(i, j + data.height * 3 / 2, 0),
-            new THREE.Vector3(i, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height * 3 / 2, 0),
+            new THREE.Vector3(i + data.width * .5, j + data.height, 0),
+            new THREE.Vector3(i + data.width * .5, j, 0),
+            new THREE.Vector3(i + data.width * 1.5, j, 0),
+            new THREE.Vector3(i + data.width * 1.5, j + data.height, 0),
           ]);
           if (num !== 0 && num) num--;
           if (num === 0) return <any>pf;

@@ -13,7 +13,7 @@ export interface TamuBrickWorkBase {
    * @param data
    * @param shape
    */
-  makeObject(data: any, shape: THREE.Shape): THREE.Object3D;
+  makeObject(data: any, shape: THREE.Shape): THREE.Geometry;
 
   /**
    * 根据大小计算拼法

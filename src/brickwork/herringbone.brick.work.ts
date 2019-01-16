@@ -1,11 +1,13 @@
 import {TamuBrickWorkBase} from './base/tamu.brick.work.base';
 import {AnimationBase} from '../animation/base/animation.base';
 import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
+import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
-export class Oo2BrickWork implements TamuBrickWorkBase {
-  public version = '1of2';
+export class HerringboneBrickWork implements TamuBrickWorkBase {
+
+  public version = 'herringbone';
 
   private animationUtil: AnimationBase;
 
@@ -18,7 +20,6 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
-    console.log('size', size);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
     geometry.generateFaceUV(vertices, data.subsection);
     // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
@@ -26,7 +27,7 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, data.height * 2), 5);
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, data.height), 5);
     let objs: THREE.Mesh[] = [];
     let matrixes = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -50,31 +51,46 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
-    for (let i = start.x - data.width; i <= size.x; i += data.width) {
-      for (let j = start.y - data.height; j <= size.y; j += data.height) {
+    let move = 0;
+    let muip = Math.floor(data.height / data.width);
+    let desm = data.height - (muip * data.width);
+    let des = 0;
+    // num = 5;
+    // start.x = data.width;
+    // start.y = data.height;
+    // size.x = data.width;
+    // size.y = data.height;
+    for (let i = start.x - size.x; i <= size.x + data.width; i += next ? (muip * data.width) : (data.height)) {
+      for (let j = start.y - data.height; j <= size.y + data.height; j += data.width) {
         if (num === 0) return <any>pf;
         if (next) {
+          console.log('i', i);
           // 正常
           pf.push([
-            new THREE.Vector3(i, j + data.height, 0),
-            new THREE.Vector3(i, j, 0),
-            new THREE.Vector3(i + data.width, j, 0),
-            new THREE.Vector3(i + data.width, j + data.height, 0),
+            new THREE.Vector3(i + data.height + move, j + data.width - des, 0),
+            new THREE.Vector3(i + move, j + data.width - des, 0),
+            new THREE.Vector3(i + move, j - des, 0),
+            new THREE.Vector3(i + data.height + move, j - des, 0),
           ]);
+          move += data.width;
           if (num !== 0 && num) num--;
           if (num === 0) return <any>pf;
         } else {
+          let center = new THREE.Vector3(i + (data.width / 2) + move, j + (data.width / 2) - des, 0);
           // 错位
           pf.push([
-            new THREE.Vector3(i, j + data.height * 3 / 2, 0),
-            new THREE.Vector3(i, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height * 3 / 2, 0),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.height + move, j + data.width - des, 0), center, -Math.PI / 2),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + move, j + data.width - des, 0), center, -Math.PI / 2),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + move, j - des, 0), center, -Math.PI / 2),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.height + move, j - des, 0), center, -Math.PI / 2),
           ]);
+          move += data.width;
           if (num !== 0 && num) num--;
           if (num === 0) return <any>pf;
         }
       }
+      des += next ? 0 : desm;
+      move = 0;
       next = !next;
     }
     return <any>pf;
