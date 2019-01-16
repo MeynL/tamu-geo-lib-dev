@@ -25,11 +25,12 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     return plan;
   }
 
-  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[]} {
+  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[], center: any} {
     let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 7, data.height * 5), 5);
     let objs: THREE.Mesh[] = [];
     let matrixes = [];
     let center = TamuGeometryUtil.getCenter(vertices);
+    let _center;
     vertices.forEach((ver: any, index: number) => {
       let geo = new TamuFloorGeometry(new THREE.Shape([
         new THREE.Vector2(ver[0].x, ver[0].y),
@@ -39,17 +40,22 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
       ]));
       geo.buldSingleFloor(data.subsection);
       geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
-      let _center = TamuGeometryUtil.getCenter([geo.vertices]);
+      _center = TamuGeometryUtil.getCenter([geo.vertices]);
       if (index <= 2) {
-        matrixes.push(new THREE.Matrix4().getInverse(
-          new THREE.Matrix4().makeTranslation(-_center.x, _center.y, _center.z).multiply(new THREE.Matrix4().makeRotationZ(-Math.PI / 4))));
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(-Math.PI / 4), mat);
+        // geo.applyMatrix(mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
       } else {
-        matrixes.push(new THREE.Matrix4().getInverse(
-          new THREE.Matrix4().makeTranslation(-_center.x, _center.y, _center.z).multiply(new THREE.Matrix4().makeRotationZ(Math.PI / 4))));
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(Math.PI / 4), mat);
+        // geo.applyMatrix(mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
       }
+      // geo.applyMatrix(matrixes[matrixes.length - 1]);
       objs.push(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({wireframe: true})));
     });
-    return {objs: objs, materixes: matrixes};
+    return {objs: objs, materixes: matrixes, center: _center};
   }
 
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {

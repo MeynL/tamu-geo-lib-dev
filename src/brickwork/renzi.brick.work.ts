@@ -2,6 +2,7 @@ import {TamuBrickWorkBase} from './base/tamu.brick.work.base';
 import {AnimationBase} from '../animation/base/animation.base';
 import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
 import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
+import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
 export class RenziBrickWork implements TamuBrickWorkBase {
@@ -21,16 +22,42 @@ export class RenziBrickWork implements TamuBrickWorkBase {
     return plan;
   }
 
-  makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    return undefined;
+  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 3, data.height * 4), 5);
+    let objs: THREE.Mesh[] = [];
+    let matrixes = [];
+    let center = TamuGeometryUtil.getCenter(vertices);
+    vertices.forEach((ver: any, index: number) => {
+      let geo = new TamuFloorGeometry(new THREE.Shape([
+        new THREE.Vector2(ver[0].x, ver[0].y),
+        new THREE.Vector2(ver[1].x, ver[1].y),
+        new THREE.Vector2(ver[2].x, ver[2].y),
+        new THREE.Vector2(ver[3].x, ver[3].y),
+      ]));
+      geo.buldSingleFloor(data.subsection);
+      geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
+      let _center = TamuGeometryUtil.getCenter([geo.vertices]);
+      if (index % 2 === 0) {
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(-Math.PI / 4), mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
+      } else {
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(Math.PI / 4), mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
+      }
+      objs.push(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({wireframe: true})));
+    });
+    return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
-    for (let i = start.x - data.width; i <= size.x; i += (data.height / Math.sqrt(2))) {
-      for (let j = start.y - data.height; j <= size.y; j += (data.width * Math.sqrt(2))) {
+    for (let j = start.y - data.height; j <= size.y; j += (data.width * Math.sqrt(2))) {
+      for (let i = start.x - data.width; i <= size.x; i += (data.height / Math.sqrt(2))) {
         let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
+        if (num === 0) return <any>pf;
         if (next) {
           // 正常
           pf.push([
@@ -39,6 +66,8 @@ export class RenziBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, Math.PI / 4),
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, Math.PI / 4),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
         } else {
           // 错位
           pf.push([
@@ -47,9 +76,11 @@ export class RenziBrickWork implements TamuBrickWorkBase {
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, -Math.PI / 4).add(new THREE.Vector3(0, -data.width * Math.sqrt(2) / 2, 0)),
             FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, -Math.PI / 4).add(new THREE.Vector3(0, -data.width * Math.sqrt(2) / 2, 0)),
           ]);
+          if (num !== 0 && num) num--;
+          if (num === 0) return <any>pf;
         }
+        next = !next;
       }
-      next = !next;
     }
     return <any>pf;
   }
