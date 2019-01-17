@@ -26,7 +26,7 @@ export class RenziBrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 3, data.height * 4), new THREE.Vector2(5, 3));
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 7, data.height * 7), new THREE.Vector2(5, 3));
     let objs: THREE.Mesh[] = [];
     let matrixes: any = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -40,7 +40,7 @@ export class RenziBrickWork implements TamuBrickWorkBase {
       geo.buldSingleFloor(data.subsection);
       geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
       let _center = TamuGeometryUtil.getCenter([geo.vertices]);
-      if (index % 2 === 0) {
+      if (index > 2) {
         let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
         mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(-Math.PI / 4), mat);
         matrixes.push(new THREE.Matrix4().getInverse(mat));

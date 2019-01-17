@@ -25,7 +25,7 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, data.height * 2), 5);
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 5, data.height * 5), new THREE.Vector2(5, 2));
     let objs: THREE.Mesh[] = [];
     let matrixes: any = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -46,12 +46,18 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
     return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
+    let count;
+    // num = new THREE.Vector2(5, 3);
+    if (num) {
+      count = num.y;
+    }
     for (let i = start.x - data.width; i <= size.x; i += data.width) {
       for (let j = start.y - data.height; j <= size.y; j += data.height) {
-        if (num === 0) return <any>pf;
+        if (num && num.x === 0) return <any>pf;
+        if (num && count === 0) continue;
         if (next) {
           // 正常
           pf.push([
@@ -60,8 +66,12 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
             new THREE.Vector3(i + data.width, j, 0),
             new THREE.Vector3(i + data.width, j + data.height, 0),
           ]);
-          if (num !== 0 && num) num--;
-          if (num === 0) return <any>pf;
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
         } else {
           // 错位
           pf.push([
@@ -70,10 +80,15 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
             new THREE.Vector3(i + data.width, j + data.height / 2, 0),
             new THREE.Vector3(i + data.width, j + data.height * 3 / 2, 0),
           ]);
-          if (num !== 0 && num) num--;
-          if (num === 0) return <any>pf;
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
         }
       }
+      if (num) count = num.y;
       next = !next;
     }
     return <any>pf;
