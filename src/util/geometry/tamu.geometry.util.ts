@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import 'polybooljs';
-import {data} from '../../../../src/mock-api/data';
 
 declare const PolyBool: any;
 
