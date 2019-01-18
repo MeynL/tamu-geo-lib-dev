@@ -13,17 +13,18 @@ export class BubugaoBrickWork implements TamuBrickWorkBase {
     if (version) this.version = version;
   }
 
-  makeObject(data: { width: number, height: number, subsection: number }, shape: THREE.Shape): THREE.Geometry {
+  makeObject(data: { width: number, height: number, subsection: number, angle: number }, shape: THREE.Shape): THREE.Geometry {
+    if (!data.angle) data.angle = 0;
     let geometry = new TamuFloorGeometry(shape);
+    geometry.applyMatrix(new THREE.Matrix4().makeRotationZ(data.angle));
     geometry.computeBoundingBox();
-    geometry.computeBoundingSphere();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
-    // let vertices = this.makeVertices(data, new THREE.Vector2(0, 0), new THREE.Vector2(data.width * 2, data.height * 3));
-    // let points = shape.extractPoints(1);
-    // let shapes = TamuGeometryUtil.buildShape(vertices, (<any>points).shape);
     geometry.generateFaceUV(vertices, data.subsection);
-    // let plan = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial());
+    geometry.mergeVertices();
+    geometry.applyMatrix(new THREE.Matrix4().makeRotationZ(-data.angle));
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
     return geometry;
   }
 

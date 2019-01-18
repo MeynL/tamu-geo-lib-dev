@@ -51,6 +51,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
    * @param subsection 几拼图
    */
   public generateFaceUV(vertices: [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][], subsection: number) {
+    console.log('sss', vertices);
     for (let i = 0; i < subsection; i++) {
       this.halfs.push({
         size: new THREE.Vector2(1 / subsection, 1),
@@ -194,8 +195,8 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (FlooringplanUtil.pointInPolygon2(p4.x, p4.y, this.poly)) {
       truePoints.push(p4);
     }
-    if (truePoints.length === 4) {
-    // if (truePoints) {
+    // if (truePoints.length === 4) {
+    if (truePoints) {
       // pushFace([p1, p2, p3, p4], half);
       let triangleList = this.findTriangleFromPoly([p1, p2, p3, p4]);
       triangleList.forEach(triangle => {

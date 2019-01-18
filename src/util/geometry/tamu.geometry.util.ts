@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import 'polybooljs';
+import {data} from '../../../../src/mock-api/data';
+import {FlooringplanUtil} from 'tamu-geo-lib/util/floorplan/flooringplan.util';
 
 declare const PolyBool: any;
 
