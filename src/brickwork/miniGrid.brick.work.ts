@@ -55,8 +55,8 @@ export class MiniGridBrickWork implements TamuBrickWorkBase {
     if (num) {
       count = num.y;
     }
-    for (let i = start.x - data.width; i <= size.x; i += data.width) {
-      for (let j = start.y - data.height; j <= size.y; j += data.height) {
+    for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
+      for (let j = start.y - data.height; j <= start.y + size.y; j += data.height) {
         if (num && num.x === 0) return <any>pf;
         if (num && count === 0) continue;
         // 正常

@@ -69,8 +69,8 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
     if (num) {
       count = num.y;
     }
-    for (let i = start.x - size.x; i <= size.x + data.width; i += next ? (muip * data.width) : (data.height)) {
-      for (let j = start.y - data.height; j <= size.y + data.height; j += data.width) {
+    for (let i = start.x - size.x; i <= start.x + size.x + data.width; i += next ? (muip * data.width) : (data.height)) {
+      for (let j = start.y - data.height; j <= start.y + size.y + data.height; j += data.width) {
         if (num && num.x === 0) return <any>pf;
         if (num && count === 0) continue;
         if (next) {

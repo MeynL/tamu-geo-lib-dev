@@ -4,6 +4,7 @@ import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
 import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
+import {st} from '@angular/core/src/render3';
 
 export class DiamondBrickWork implements TamuBrickWorkBase {
   public version = 'diamond';
@@ -62,8 +63,8 @@ export class DiamondBrickWork implements TamuBrickWorkBase {
     if (num) {
       count = num.y;
     }
-    for (let i = start.x - data.width; i <= size.x + data.width; i += (data.height / Math.sqrt(2))) {
-      for (let j = start.y - data.height; j <= size.y + data.height; j += (data.width * Math.sqrt(2))) {
+    for (let i = start.x - data.width; i <= start.x + size.x + data.width; i += (data.height / Math.sqrt(2))) {
+      for (let j = start.y - data.height; j <= start.y + size.y + data.height; j += (data.width * Math.sqrt(2))) {
         let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
         if (num && num.x === 0) return <any>pf;
         if (num && count === 0) continue;

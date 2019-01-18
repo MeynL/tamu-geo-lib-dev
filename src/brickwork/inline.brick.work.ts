@@ -52,8 +52,8 @@ export class InlineBrickWork implements TamuBrickWorkBase {
 
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
-    for (let i = start.x - data.width; i <= size.x; i += data.width) {
-      for (let j = start.y - data.height; j <= size.y; j += data.height) {
+    for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
+      for (let j = start.y - data.height; j <= start.y + size.y; j += data.height) {
         if (num === 0) return <any>pf;
         // 正常
         pf.push([

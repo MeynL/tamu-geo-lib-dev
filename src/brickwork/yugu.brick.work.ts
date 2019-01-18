@@ -27,8 +27,8 @@ export class YuguBrickWork implements TamuBrickWorkBase {
   makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
-    for (let i = start.x - data.width; i <= size.x; i += data.width) {
-      for (let j = start.y - data.height - data.height / 2; j <= size.y; j += data.height) {
+    for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
+      for (let j = start.y - data.height - data.height / 2; j <= start.y + size.y; j += data.height) {
         if (next) {
           // 正常
           pf.push([
