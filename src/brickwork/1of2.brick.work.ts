@@ -3,7 +3,6 @@ import {AnimationBase} from '../animation/base/animation.base';
 import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
-import {FlooringplanUtil} from 'tamu-geo-lib/util/floorplan/flooringplan.util';
 
 export class Oo2BrickWork implements TamuBrickWorkBase {
   public version = '1of2';
