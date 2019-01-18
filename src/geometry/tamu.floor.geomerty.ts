@@ -85,7 +85,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     this.uvStart = 0;
   }
 
-  public rotatePoly(angle) {
+  public rotatePoly(angle: any) {
     // let maxX, maxY, minX, minY;
     // this.polyJson.forEach(v => {
     //   if (!maxX) maxX = v[0];
@@ -231,7 +231,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
         inverted: false,
       });
       if (intersect.regions.length > 0) {
-        intersect.regions.forEach(reg => {
+        intersect.regions.forEach((reg: any) => {
           let vecs = this.polyListBuildThreeVector2(reg);
           if (!this.computePolyDirection(vecs)) {
             vecs = this.changePolyDirection(vecs);
