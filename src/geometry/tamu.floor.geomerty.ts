@@ -24,6 +24,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (this.vertices.length > 0) {
       this.poly = this.vertices.concat(this.vertices[0]);
       this.polyJson = this.threeVector2BuildPolyList(this.poly);
+      console.log('ver', JSON.stringify(this.vertices));
     }
     // this.halfs = [{
     //   size: new THREE.Vector2(1, 1),
@@ -86,6 +87,10 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
   }
 
   public rotatePoly(angle: any) {
+    this.applyMatrix(new THREE.Matrix4().makeRotationZ(angle));
+    this.poly = this.vertices.concat(this.vertices[0]);
+    this.polyJson = this.threeVector2BuildPolyList(this.poly);
+    // console.log('ver', JSON.stringify(this.vertices));
     // let maxX, maxY, minX, minY;
     // this.polyJson.forEach(v => {
     //   if (!maxX) maxX = v[0];
