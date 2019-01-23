@@ -53,7 +53,7 @@ export class YuguBrickWork implements TamuBrickWorkBase {
       }
       next = !next;
     }
-    return pf;
+    return <any>pf;
   }
 
 }
