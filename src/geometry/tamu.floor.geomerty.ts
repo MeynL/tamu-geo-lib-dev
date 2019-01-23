@@ -24,7 +24,6 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     if (this.vertices.length > 0) {
       this.poly = this.vertices.concat(this.vertices[0]);
       this.polyJson = this.threeVector2BuildPolyList(this.poly);
-      console.log('ver', JSON.stringify(this.vertices));
     }
     // this.halfs = [{
     //   size: new THREE.Vector2(1, 1),
