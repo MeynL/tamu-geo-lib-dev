@@ -10,4 +10,5 @@ export * from './brickwork/herringbone.brick.work';
 export * from './brickwork/inline.brick.work';
 export * from './brickwork/oneOfThree.brick.work';
 export * from './brickwork/yugu.brick.work';
+export * from './brickwork/mirror.brick.work';
 export * from './animation/base/animation.base';
