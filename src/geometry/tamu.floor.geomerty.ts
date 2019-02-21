@@ -50,7 +50,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
    * @param vertices
    * @param subsection 几拼图
    */
-  public generateFaceUV(vertices: [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][], subsection: number, uvVertices?) {
+  public generateFaceUV(vertices: [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][], subsection: number, uvVertices?: any) {
     for (let i = 0; i < subsection; i++) {
       this.halfs.push({
         size: new THREE.Vector2(1 / subsection, 1),
@@ -203,7 +203,7 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     this.half = this.halfs[Math.ceil(this.halfs.length * Math.random()) - 1];
   }
 
-  private buildFace(p1: THREE.Vector3, p2: THREE.Vector3, p3: THREE.Vector3, p4: THREE.Vector3, polyAxis) {
+  private buildFace(p1: THREE.Vector3, p2: THREE.Vector3, p3: THREE.Vector3, p4: THREE.Vector3, polyAxis: any) {
     this.randomHalf();
     let truePoints: THREE.Vector3[] = [];
     if (FlooringplanUtil.pointInPolygon2(p1.x, p1.y, this.poly)) {
