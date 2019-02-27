@@ -368,5 +368,15 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     });
     return vecList;
   }
-
+  public dispose() {
+    console.log('tamufloor dispose')
+    super.dispose();
+    this.halfs = null;
+    this.start = null;
+    this.uvStart = null;
+    this.half = null;
+    this.poly = null;
+    this.polyJson = null;
+    this.shape = null;
+  }
 }
