@@ -31,6 +31,17 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
     // }];
   }
 
+  public dispose() {
+    super.dispose();
+    this.halfs = null;
+    this.start = null;
+    this.uvStart = null;
+    this.half = null;
+    this.poly = null;
+    this.polyJson = null;
+    this.shape = null;
+  }
+
   public buldSingleFloor(subsection: number) {
     let vertices = this.vertices.concat([]);
     this.clearShape();
@@ -367,16 +378,5 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
       vecList.push(new THREE.Vector3(point[0], point[1], 0));
     });
     return vecList;
-  }
-  public dispose() {
-    console.log('tamufloor dispose')
-    super.dispose();
-    this.halfs = null;
-    this.start = null;
-    this.uvStart = null;
-    this.half = null;
-    this.poly = null;
-    this.polyJson = null;
-    this.shape = null;
   }
 }
