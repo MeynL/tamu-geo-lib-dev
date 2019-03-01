@@ -238,13 +238,18 @@ export class TamuFloorGeometry extends THREE.ShapeGeometry {
       });
     } else {
       let _face = this.threeVector2BuildPolyList([p1, p2, p3, p4]);
-      let intersect = PolyBool.intersect({
-        regions: [_face],
-        inverted: false,
-      }, {
-        regions: [this.polyJson],
-        inverted: false,
-      });
+      let intersect;
+      try {
+        intersect = PolyBool.intersect({
+          regions: [_face],
+          inverted: false,
+        }, {
+          regions: [this.polyJson],
+          inverted: false,
+        });
+      } catch (e) {
+        return;
+      }
       if (intersect.regions.length > 0) {
         intersect.regions.forEach((reg: any) => {
           let vecs = this.polyListBuildThreeVector2(reg);
