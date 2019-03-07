@@ -4,7 +4,6 @@ import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
 import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
-import {st} from '@angular/core/src/render3';
 
 export class DiamondBrickWork implements TamuBrickWorkBase {
   public version = 'diamond';
