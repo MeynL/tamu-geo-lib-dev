@@ -31,7 +31,7 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 10, data.height * 10), new THREE.Vector2(5, 3));
+    let vertices = this.makeVertices(data, new THREE.Vector2(0, 0), new THREE.Vector2(data.width * 10, data.height * 10), new THREE.Vector2(6, 3));
     let objs: THREE.Mesh[] = [];
     let matrixes: any = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -78,6 +78,7 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
         if (num && num.x === 0) return <any>pf;
         if (num && count === 0) continue;
         if (next) {
+          console.log('?????');
           // 正常
           pf.push([
             new THREE.Vector3(i + data.height + move, j + data.width - des, 0),
@@ -113,6 +114,7 @@ export class HerringboneBrickWork implements TamuBrickWorkBase {
       if (num) count = num.y;
       des += next ? 0 : desm;
       move = 0;
+      console.log('changfe');
       next = !next;
     }
     return <any>pf;

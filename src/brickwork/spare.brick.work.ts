@@ -29,7 +29,7 @@ export class SpareBrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 2, data.height * 2), new THREE.Vector2(5, 3));
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 2, data.height * 2), new THREE.Vector2(6, 3));
     let objs: THREE.Mesh[] = [];
     let matrixes: any = [];
     let center = TamuGeometryUtil.getCenter(vertices);
