@@ -15,3 +15,4 @@ export * from './brickwork/fashan.brick.work';
 export * from './brickwork/shousuo.brick.work';
 export * from './brickwork/xuanzhuan.brick.work';
 export * from './animation/base/animation.base';
+export * from './combination/xbox.combination';
