@@ -52,7 +52,7 @@ export class FashanBrickWork implements TamuBrickWorkBase {
     return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: any): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let change = true;
     let next = true;
