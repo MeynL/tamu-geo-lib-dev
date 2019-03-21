@@ -1,11 +1,13 @@
 import {TamuBrickWorkBase} from './base/tamu.brick.work.base';
 import {AnimationBase} from '../animation/base/animation.base';
 import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
+import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
-export class MirrorBrickWork implements TamuBrickWorkBase {
-  public version = 'mirror';
+export class XuanzhuanBrickWork implements TamuBrickWorkBase {
+
+  public version = 'xuanzhuan';
 
   private animationUtil: AnimationBase;
 
@@ -20,7 +22,7 @@ export class MirrorBrickWork implements TamuBrickWorkBase {
     geometry.computeBoundingBox();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
-    geometry.generateFaceUV(vertices, data.subsection, this.makeUvVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y)));
+    geometry.generateFaceUV(vertices, data.subsection);
     geometry.mergeVertices();
     geometry.applyMatrix(new THREE.Matrix4().makeRotationZ(-data.angle));
     geometry.computeBoundingBox();
@@ -29,7 +31,7 @@ export class MirrorBrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, 0), 6);
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 5, data.height * 5), new THREE.Vector2(6, 2));
     let objs: THREE.Mesh[] = [];
     let matrixes: any = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -50,52 +52,62 @@ export class MirrorBrickWork implements TamuBrickWorkBase {
     return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
-    for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
-      for (let j = start.y - data.height; j <= start.y + size.y; j += data.height) {
-        if (num === 0) return <any>pf;
-        // 正常
-        pf.push([
-          new THREE.Vector3(i, j + data.height, 0),
-          new THREE.Vector3(i, j, 0),
-          new THREE.Vector3(i + data.width, j, 0),
-          new THREE.Vector3(i + data.width, j + data.height, 0),
-        ]);
-        if (num !== 0 && num) num--;
-        if (num === 0) return <any>pf;
-      }
+    let count;
+    if (num) {
+      count = num.y;
     }
-    return <any>pf;
-  }
-
-  private makeUvVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
-    let pf = [];
-    let diff = true;
+    let change = true;
+    let change1 = true;
     for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
       for (let j = start.y - data.height; j <= start.y + size.y; j += data.height) {
-        if (num === 0) return <any>pf;
-        // 正常
-        if (diff) {
-          pf.push([
-            new THREE.Vector3(i, j + data.height, 0),
-            new THREE.Vector3(i, j, 0),
-            new THREE.Vector3(i + data.width, j, 0),
-            new THREE.Vector3(i + data.width, j + data.height, 0),
-          ]);
+        if (num && num.x === 0) return <any>pf;
+        if (num && count === 0) continue;
+        if (change) {
+          if (change1) {
+            pf.push([
+              new THREE.Vector3(i + data.width, j, 0),
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+              new THREE.Vector3(i, j + data.height, 0),
+              new THREE.Vector3(i, j, 0),
+            ]);
+          } else {
+            pf.push([
+              new THREE.Vector3(i, j, 0),
+              new THREE.Vector3(i + data.width, j, 0),
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+              new THREE.Vector3(i, j + data.height, 0),
+            ]);
+          }
         } else {
-          // 镜像
-          pf.push([
-            new THREE.Vector3(i + data.width, j + data.height, 0), // 3
-            new THREE.Vector3(i + data.width, j, 0), // 2
-            new THREE.Vector3(i, j, 0), // 1
-            new THREE.Vector3(i, j + data.height, 0), // 0
-          ]);
+          if (change1) {
+            pf.push([
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+              new THREE.Vector3(i, j + data.height, 0),
+              new THREE.Vector3(i, j, 0),
+              new THREE.Vector3(i + data.width, j, 0),
+            ]);
+          } else {
+            pf.push([
+              new THREE.Vector3(i, j + data.height, 0),
+              new THREE.Vector3(i, j, 0),
+              new THREE.Vector3(i + data.width, j, 0),
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+            ]);
+          }
         }
-        if (num !== 0 && num) num--;
-        if (num === 0) return <any>pf;
+        change1 = !change1;
+        if (num) {
+          count--;
+          num.x--;
+        }
+        if (num && num.x === 0) return <any>pf;
+        if (num && count === 0) continue;
       }
-      diff = !diff;
+      if (num) count = num.y;
+      change = !change;
+      change1 = true;
     }
     return <any>pf;
   }

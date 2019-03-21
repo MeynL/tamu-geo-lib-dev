@@ -4,8 +4,8 @@ import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
 import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
-export class MirrorBrickWork implements TamuBrickWorkBase {
-  public version = 'mirror';
+export class FashanBrickWork implements TamuBrickWorkBase {
+  public version = 'fashan';
 
   private animationUtil: AnimationBase;
 
@@ -20,7 +20,9 @@ export class MirrorBrickWork implements TamuBrickWorkBase {
     geometry.computeBoundingBox();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
+
     geometry.generateFaceUV(vertices, data.subsection, this.makeUvVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y)));
+    // geometry.generateFaceUV(vertices, data.subsection);
     geometry.mergeVertices();
     geometry.applyMatrix(new THREE.Matrix4().makeRotationZ(-data.angle));
     geometry.computeBoundingBox();
@@ -29,7 +31,7 @@ export class MirrorBrickWork implements TamuBrickWorkBase {
   }
 
   makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width, 0), 6);
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 5, data.height * 5), new THREE.Vector2(6, 2));
     let objs: THREE.Mesh[] = [];
     let matrixes: any = [];
     let center = TamuGeometryUtil.getCenter(vertices);
@@ -50,33 +52,15 @@ export class MirrorBrickWork implements TamuBrickWorkBase {
     return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
+    let change = true;
+    let next = true;
     for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
       for (let j = start.y - data.height; j <= start.y + size.y; j += data.height) {
         if (num === 0) return <any>pf;
         // 正常
-        pf.push([
-          new THREE.Vector3(i, j + data.height, 0),
-          new THREE.Vector3(i, j, 0),
-          new THREE.Vector3(i + data.width, j, 0),
-          new THREE.Vector3(i + data.width, j + data.height, 0),
-        ]);
-        if (num !== 0 && num) num--;
-        if (num === 0) return <any>pf;
-      }
-    }
-    return <any>pf;
-  }
-
-  private makeUvVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
-    let pf = [];
-    let diff = true;
-    for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
-      for (let j = start.y - data.height; j <= start.y + size.y; j += data.height) {
-        if (num === 0) return <any>pf;
-        // 正常
-        if (diff) {
+        if (next) {
           pf.push([
             new THREE.Vector3(i, j + data.height, 0),
             new THREE.Vector3(i, j, 0),
@@ -84,18 +68,71 @@ export class MirrorBrickWork implements TamuBrickWorkBase {
             new THREE.Vector3(i + data.width, j + data.height, 0),
           ]);
         } else {
-          // 镜像
           pf.push([
-            new THREE.Vector3(i + data.width, j + data.height, 0), // 3
-            new THREE.Vector3(i + data.width, j, 0), // 2
-            new THREE.Vector3(i, j, 0), // 1
-            new THREE.Vector3(i, j + data.height, 0), // 0
+            new THREE.Vector3(i + data.width, j, 0),
+            new THREE.Vector3(i + data.width, j + data.height, 0),
+            new THREE.Vector3(i, j + data.height, 0),
+            new THREE.Vector3(i, j, 0),
           ]);
         }
+        next = !next;
         if (num !== 0 && num) num--;
         if (num === 0) return <any>pf;
       }
-      diff = !diff;
+      // change = !change;
+      next = true;
+    }
+    return <any>pf;
+
+  }
+
+  private makeUvVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: number): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+    let pf = [];
+    let change = true;
+    let next = true;
+    for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
+      for (let j = start.y - data.height; j <= start.y + size.y; j += data.height) {
+        if (num === 0) return <any>pf;
+        // 正常
+        if (next) {
+          if (change) {
+            pf.push([
+              new THREE.Vector3(i, j + data.height, 0),
+              new THREE.Vector3(i, j, 0),
+              new THREE.Vector3(i + data.width, j, 0),
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+            ]);
+          } else {
+            pf.push([
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+              new THREE.Vector3(i + data.width, j, 0),
+              new THREE.Vector3(i, j, 0),
+              new THREE.Vector3(i, j + data.height, 0),
+            ]);
+          }
+        } else {
+          if (!change) {
+            pf.push([
+              new THREE.Vector3(i + data.width, j, 0),
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+              new THREE.Vector3(i, j + data.height, 0),
+              new THREE.Vector3(i, j, 0),
+            ]);
+          } else {
+            pf.push([
+              new THREE.Vector3(i, j, 0),
+              new THREE.Vector3(i, j + data.height, 0),
+              new THREE.Vector3(i + data.width, j + data.height, 0),
+              new THREE.Vector3(i + data.width, j, 0),
+            ]);
+          }
+        }
+        next = !next;
+        if (num !== 0 && num) num--;
+        if (num === 0) return <any>pf;
+      }
+      change = !change;
+      next = true;
     }
     return <any>pf;
   }

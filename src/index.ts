@@ -11,4 +11,7 @@ export * from './brickwork/inline.brick.work';
 export * from './brickwork/oneOfThree.brick.work';
 export * from './brickwork/yugu.brick.work';
 export * from './brickwork/mirror.brick.work';
+export * from './brickwork/fashan.brick.work';
+export * from './brickwork/shousuo.brick.work';
+export * from './brickwork/xuanzhuan.brick.work';
 export * from './animation/base/animation.base';
