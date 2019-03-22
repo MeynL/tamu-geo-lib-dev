@@ -18,3 +18,8 @@ export * from './animation/base/animation.base';
 export * from './combination/xbox.combination';
 export * from './combination/spare.combination';
 export * from './combination/diamond.combination';
+export * from './combination/herringbone.combination';
+export * from './combination/miniGrid.combination';
+export * from './combination/shousuo.combination';
+export * from './combination/xuanzhuan.combination';
+export * from './combination/fashan.combination';
