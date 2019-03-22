@@ -16,3 +16,5 @@ export * from './brickwork/shousuo.brick.work';
 export * from './brickwork/xuanzhuan.brick.work';
 export * from './animation/base/animation.base';
 export * from './combination/xbox.combination';
+export * from './combination/spare.combination';
+export * from './combination/diamond.combination';

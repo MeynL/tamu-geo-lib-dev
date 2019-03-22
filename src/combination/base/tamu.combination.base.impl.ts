@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import {TamuGeometry} from 'tamujs';
 
 export class TamuCombinationBaseImpl implements TamuCombinationBase {
-  public readonly width: number;
-  public readonly height: number;
-  public readonly materialData: any[] = [];
+  public width: number;
+  public height: number;
+  public materialData: any[] = [];
 
   constructor() {
   }

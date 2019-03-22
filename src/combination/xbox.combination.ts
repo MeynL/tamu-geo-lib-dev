@@ -3,25 +3,27 @@ import * as THREE from 'three';
 import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
 
 export class XboxCombination extends TamuCombinationBaseImpl {
-  public readonly materialData: any[] = [
-    {
-      uuid: FlooringplanUtil.guid(),
-      name: '面1',
-      opts: {
-        map: 'https://resources.wecareroom.com/item/2019/3/WMPNFVLT.jpeg',
-      },
-    },
-    {
-      uuid: FlooringplanUtil.guid(),
-      name: '面2',
-      opts: {
-        map: 'https://resources.wecareroom.com/item/2019/3/MNTEKAXQ.jpeg',
-      },
-    },
-  ];
 
   constructor() {
     super();
+    this.width = 800;
+    this.height = 800;
+    this.materialData = [
+      {
+        uuid: FlooringplanUtil.guid(),
+        name: '面1',
+        opts: {
+          map: 'https://resources.wecareroom.com/item/2019/3/WMPNFVLT.jpeg',
+        },
+      },
+      {
+        uuid: FlooringplanUtil.guid(),
+        name: '面2',
+        opts: {
+          map: 'https://resources.wecareroom.com/item/2019/3/MNTEKAXQ.jpeg',
+        },
+      },
+    ];
   }
 
   public makeObjects(): Promise<THREE.Geometry> {
