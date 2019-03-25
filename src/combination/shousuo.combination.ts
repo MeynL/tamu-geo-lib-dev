@@ -8,7 +8,7 @@ export class ShousuoCombination extends TamuCombinationBaseImpl {
     super();
   }
 
-  public makeObjects(option?): Promise<THREE.Geometry> {
+  public makeObjects(option?: any): Promise<THREE.Geometry> {
     return new Promise<THREE.Geometry>(resolve => {
       this.width = option.width * 2;
       this.height = option.height * 2;

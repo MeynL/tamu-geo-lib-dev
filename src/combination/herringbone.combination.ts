@@ -9,7 +9,7 @@ export class HerringboneCombination extends TamuCombinationBaseImpl {
     super();
   }
 
-  public makeObjects(option?): Promise<THREE.Geometry> {
+  public makeObjects(option?: any): Promise<THREE.Geometry> {
     return new Promise<THREE.Geometry>(resolve => {
       let muip = Math.floor(option.height / option.width);
       this.width = option.height + (option.width * muip);

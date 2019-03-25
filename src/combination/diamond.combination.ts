@@ -9,7 +9,7 @@ export class DiamondCombination extends TamuCombinationBaseImpl {
     super();
   }
 
-  public makeObjects(option?): Promise<THREE.Geometry> {
+  public makeObjects(option?: any): Promise<THREE.Geometry> {
     return new Promise<THREE.Geometry>(resolve => {
       this.width = option.width / Math.sqrt(2) + option.height * Math.sqrt(2);
       this.height = option.width / Math.sqrt(2) + option.height / Math.sqrt(2);

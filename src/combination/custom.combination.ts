@@ -5,9 +5,9 @@ import {TamuGeometry} from 'tamujs';
 
 export class CustomCombination extends TamuCombinationBaseImpl {
 
-  public localMaterial;
+  public localMaterial: any;
 
-  public pushMaterial;
+  public pushMaterial: any;
 
   constructor() {
     super();
@@ -16,7 +16,7 @@ export class CustomCombination extends TamuCombinationBaseImpl {
     this.materialData = [];
   }
 
-  public makeObjects(option?): Promise<THREE.Geometry> {
+  public makeObjects(option?: any): Promise<THREE.Geometry> {
     this.width = option.width;
     this.height = option.height;
     this.localMaterial = option.material;
