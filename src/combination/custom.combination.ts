@@ -22,7 +22,7 @@ export class CustomCombination extends TamuCombinationBaseImpl {
     this.localMaterial = option.material;
     this.pushMaterial = option.pushMaterial;
     return new Promise<THREE.Geometry>(resolve => {
-      new THREE.FBXLoader().load('https://resources.wecareroom.com/item/2019/3/TOBNMKSD', obj => {
+      new THREE.FBXLoader().load(option.url, obj => {
         resolve(this.mergeGeometry(obj));
       });
     });
