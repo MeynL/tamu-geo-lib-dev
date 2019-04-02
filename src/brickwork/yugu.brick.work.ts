@@ -1,12 +1,17 @@
 import {TamuBrickWorkBase} from './base/tamu.brick.work.base';
 import {AnimationBase} from '../animation/base/animation.base';
 import {TamuFloorGeometry} from '../geometry/tamu.floor.geomerty';
+import {FlooringplanUtil} from '../util/floorplan/flooringplan.util';
+import {TamuGeometryUtil} from '../util/geometry/tamu.geometry.util';
 import * as THREE from 'three';
 
 export class YuguBrickWork implements TamuBrickWorkBase {
+  public version = 'yugu';
+
   private animationUtil: AnimationBase;
 
-  constructor() {
+  constructor(version?: any) {
+    if (version) this.version = version;
   }
 
   makeObject(data: { width: number, height: number, subsection: number, angle: number }, shape: THREE.Shape): THREE.Geometry {
@@ -16,7 +21,8 @@ export class YuguBrickWork implements TamuBrickWorkBase {
     geometry.computeBoundingBox();
     let size = geometry.boundingBox.max.sub(geometry.boundingBox.min);
     let vertices = this.makeVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y));
-    geometry.generateFaceUV(vertices, data.subsection);
+    geometry.generateFaceUV(vertices, data.subsection, this.makeUvVertices(data, new THREE.Vector2(geometry.boundingBox.min.x, geometry.boundingBox.min.y), new THREE.Vector2(size.x, size.y)));
+    // geometry.generateFaceUV(vertices, data.subsection);
     geometry.mergeVertices();
     geometry.applyMatrix(new THREE.Matrix4().makeRotationZ(-data.angle));
     geometry.computeBoundingBox();
@@ -24,36 +30,132 @@ export class YuguBrickWork implements TamuBrickWorkBase {
     return geometry;
   }
 
-  makeObjects(data: any, size: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
-    return undefined;
+  makeObjects(data: { width: number, height: number, subsection: number }, size?: THREE.Vector2, isAnimate?: boolean): { objs: THREE.Object3D[]; materixes: THREE.Matrix4[] } {
+    let vertices = this.makeVertices(data, new THREE.Vector2(data.width, data.height), new THREE.Vector2(data.width * 7, data.height * 7), new THREE.Vector2(6, 3));
+    let objs: THREE.Mesh[] = [];
+    let matrixes: any = [];
+    let center = TamuGeometryUtil.getCenter(vertices);
+    vertices.forEach((ver: any, index: number) => {
+      let geo = new TamuFloorGeometry(new THREE.Shape([
+        new THREE.Vector2(ver[0].x, ver[0].y),
+        new THREE.Vector2(ver[1].x, ver[1].y),
+        new THREE.Vector2(ver[2].x, ver[2].y),
+        new THREE.Vector2(ver[3].x, ver[3].y),
+      ]));
+      geo.buldSingleFloor(data.subsection);
+      geo.applyMatrix(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
+      let _center = TamuGeometryUtil.getCenter([geo.vertices]);
+      if (index > 2) {
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(-Math.PI / 4), mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
+      } else {
+        let mat = new THREE.Matrix4().makeTranslation(-_center.x, -_center.y, -_center.z);
+        mat.multiplyMatrices(new THREE.Matrix4().makeRotationZ(Math.PI / 4), mat);
+        matrixes.push(new THREE.Matrix4().getInverse(mat));
+      }
+      objs.push(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({wireframe: true})));
+    });
+    return {objs: objs, materixes: matrixes};
   }
 
-  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+  makeVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
     let pf = [];
     let next = true;
-    for (let i = start.x - data.width; i <= start.x + size.x; i += data.width) {
-      for (let j = start.y - data.height - data.height / 2; j <= start.y + size.y; j += data.height) {
+    let count;
+    // num = new THREE.Vector2(5, 3);
+    if (num) {
+      count = num.y;
+    }
+    for (let i = start.x - data.width; i <= start.x + size.x + data.width + data.width; i += ((data.height - data.width) / Math.sqrt(2))) {
+      for (let j = start.y - data.height; j <= start.y + size.y + data.height; j += (data.width * Math.sqrt(2))) {
+        let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
+        if (num && num.x === 0) return <any>pf;
+        if (num && count === 0) continue;
         if (next) {
           // 正常
           pf.push([
-            new THREE.Vector3(i, j + data.height, 0),
-            new THREE.Vector3(i, j, 0),
-            new THREE.Vector3(i + data.width, j, 0),
-            new THREE.Vector3(i + data.width, j + data.height, 0)
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height - data.width, 0), center, Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j, 0), center, Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.width, 0), center, Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, Math.PI / 4),
           ]);
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
         } else {
           // 错位
           pf.push([
-            new THREE.Vector3(i, j + data.height * 3 / 2, 0),
-            new THREE.Vector3(i, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height / 2, 0),
-            new THREE.Vector3(i + data.width, j + data.height * 3 / 2, 0)
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, -Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.width, 0), center, -Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, -Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height - data.width, 0), center, -Math.PI / 4),
           ]);
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
         }
       }
+      if (num) count = num.y;
+      next = !next;
+    }
+    return <any>pf;
+  }
+
+  private makeUvVertices(data: { width: number, height: number }, start: THREE.Vector2, size: THREE.Vector2, num?: THREE.Vector2): [THREE.Vector3, THREE.Vector3, THREE.Vector3, THREE.Vector3][] {
+    let pf = [];
+    let next = true;
+    let count;
+    // num = new THREE.Vector2(5, 3);
+    if (num) {
+      count = num.y;
+    }
+    for (let i = start.x - data.width; i <= start.x + size.x + data.width + data.width; i += ((data.height - data.width) / Math.sqrt(2))) {
+      for (let j = start.y - data.height; j <= start.y + size.y + data.height; j += (data.width * Math.sqrt(2))) {
+        let center = new THREE.Vector3((i + i + data.width) / 2, (j + j + data.height) / 2, 0);
+        if (num && num.x === 0) return <any>pf;
+        if (num && count === 0) continue;
+        if (next) {
+          // 正常
+          pf.push([
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j, 0), center, Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, Math.PI / 4),
+          ]);
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
+        } else {
+          // 错位
+          pf.push([
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j + data.height, 0), center, -Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i, j, 0), center, -Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j, 0), center, -Math.PI / 4),
+            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.width, j + data.height, 0), center, -Math.PI / 4),
+          ]);
+          if (num) {
+            count--;
+            num.x--;
+          }
+          if (num && num.x === 0) return <any>pf;
+          if (num && count === 0) continue;
+        }
+      }
+      if (num) count = num.y;
       next = !next;
     }
     return <any>pf;
   }
 
 }
+
