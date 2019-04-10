@@ -46,21 +46,36 @@ export class HerringboneCombination extends TamuCombinationBaseImpl {
     let desm = data.height - (muip * data.width);
     let des = 0;
     let count;
+
+    let unit = muip * data.width + data.height;
+    let total = size.x + 2 * data.width;
+    let paddingX = (Math.ceil(total / unit)) * unit;
+    let paddingY = (Math.ceil(total / unit)) * desm;
+
     if (num) {
       count = num.y;
     }
-    for (let i = start.x - (size.x * 2); i <= start.x + (size.x * 2); i += next ? (muip * data.width) : (data.height)) {
-      for (let j = start.y - data.height; j <= start.y + size.y + data.height; j += data.width) {
+    for (let i = start.x - data.width; i <= start.x + size.x + data.width || !next; i += next ? (muip * data.width) : (data.height)) {
+      for (let j = start.y - 2 * data.height; j <= start.y + size.y + 2 * data.height; j += data.width) {
         if (num && num.x === 0) return <any>pf;
         if (num && count === 0) continue;
+        const vertex = [
+          new THREE.Vector3(i + move + data.height, j - des + data.width, 0),
+          new THREE.Vector3(i + move              , j - des + data.width, 0),
+          new THREE.Vector3(i + move              , j - des             , 0),
+          new THREE.Vector3(i + move + data.height, j - des             , 0),
+        ];
         if (next) {
+          // 平移
+          let _vertex = vertex.map(v => {
+            if (i + move > start.x + size.x + data.width) {
+              v.setX(v.x - paddingX);
+              v.setY(v.y + paddingY);
+            }
+            return v;
+          });
           // 正常
-          pf.push([
-            new THREE.Vector3(i + data.height + move, j + data.width - des, 0),
-            new THREE.Vector3(i + move, j + data.width - des, 0),
-            new THREE.Vector3(i + move, j - des, 0),
-            new THREE.Vector3(i + data.height + move, j - des, 0),
-          ]);
+          pf.push(_vertex);
           move += data.width;
           if (num) {
             count--;
@@ -70,13 +85,17 @@ export class HerringboneCombination extends TamuCombinationBaseImpl {
           if (num && count === 0) continue;
         } else {
           let center = new THREE.Vector3(i + (data.width / 2) + move, j + (data.width / 2) - des, 0);
+          // 平移
+          let _vertex = vertex.map(v => {
+            let _v = FlooringplanUtil.rotateCornerZ(v, center, -Math.PI / 2);
+            if (i + move > start.x + size.x + data.width) {
+              _v.setX(_v.x - paddingX);
+              _v.setY(_v.y + paddingY);
+            }
+            return _v;
+          });
           // 错位
-          pf.push([
-            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.height + move, j + data.width - des, 0), center, -Math.PI / 2),
-            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + move, j + data.width - des, 0), center, -Math.PI / 2),
-            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + move, j - des, 0), center, -Math.PI / 2),
-            FlooringplanUtil.rotateCornerZ(new THREE.Vector3(i + data.height + move, j - des, 0), center, -Math.PI / 2),
-          ]);
+          pf.push(_vertex);
           move += data.width;
           if (num) {
             count--;
@@ -89,7 +108,6 @@ export class HerringboneCombination extends TamuCombinationBaseImpl {
       if (num) count = num.y;
       des += next ? 0 : desm;
       move = 0;
-      console.log('changfe');
       next = !next;
     }
     return <any>pf;
