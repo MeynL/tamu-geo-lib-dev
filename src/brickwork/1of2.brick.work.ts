@@ -14,6 +14,8 @@ export class Oo2BrickWork implements TamuBrickWorkBase {
   }
 
   makeObject(data: { width: number, height: number, subsection: number, angle: number }, shape: THREE.Shape): THREE.Geometry {
+    data.width = 300;
+    data.height = 800;
     if (!data.angle) data.angle = 0;
     let geometry = new TamuFloorGeometry(shape);
     geometry.rotatePoly(data.angle);
