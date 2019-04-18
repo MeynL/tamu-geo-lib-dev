@@ -11,8 +11,8 @@ export class DiamondCombination extends TamuCombinationBaseImpl {
 
   public makeObjects(option?: any): Promise<THREE.Geometry> {
     return new Promise<THREE.Geometry>(resolve => {
-      this.width = option.width / Math.sqrt(2) + option.height * Math.sqrt(2);
-      this.height = option.width / Math.sqrt(2) + option.height / Math.sqrt(2);
+      this.width = (option.height * 2) / Math.sqrt(2);
+      this.height = (option.width * 2) / Math.sqrt(2);
       resolve(this.makeGeometry(option, new THREE.Shape([
         new THREE.Vector2(-this.width / 2, -this.height / 2),
         new THREE.Vector2(this.width / 2, -this.height / 2),
